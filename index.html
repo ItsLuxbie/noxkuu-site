@@ -232,11 +232,8 @@
 
         // --- GEMINI API FUNCTION ---
         async function getGeminiTextResponse(prompt) {
-            const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
             const apiKey = ""; // Leave blank
-            const targetApiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
-            const apiUrl = proxyUrl + targetApiUrl;
-            
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
             const payload = { contents: [{ parts: [{ text: prompt }] }] };
 
             try {
