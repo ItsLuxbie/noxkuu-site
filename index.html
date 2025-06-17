@@ -13,6 +13,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Permanent+Marker&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
+    <!-- Azure Blob Storage SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@azure/storage-blob@12.11.0/dist/storage-blob.min.js"></script>
+
     <script>
         tailwind.config = { darkMode: 'class' };
     </script>
@@ -133,235 +136,234 @@
     <!-- JAVASCRIPT LOGIC -->
     <script src="https://cdn.jsdelivr.net/npm/@azure/storage-blob@12.11.0/dist/storage-blob.min.js"></script>
     <script>
-        /**
-         * App State & Configuration
-         */
-        const dom = {
-            themeToggle: document.getElementById('theme-toggle'), homeLink: document.getElementById('homeLink'),
-            mainContent: document.getElementById('main-content'), galleryPage: document.getElementById('gallery-page'),
-            viewFullGalleryBtn: document.getElementById('view-full-gallery-btn'), recentGallery: document.getElementById('recent-gallery-container'),
-            fullGallery: document.getElementById('full-gallery-container'), filterButtons: document.getElementById('filter-buttons'),
-            modal: document.getElementById('imageModal'), closeModalBtn: document.getElementById('closeModalBtn'),
-            modalImg: document.getElementById('modalImage'), prevBtn: document.getElementById('prevBtn'),
-            nextBtn: document.getElementById('nextBtn'), loreContainer: document.getElementById('lore-container'),
-            yearSpan: document.getElementById('year'),
-        };
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // --- App State & Configuration ---
+            const dom = {
+                themeToggle: document.getElementById('theme-toggle'),
+                homeLink: document.getElementById('homeLink'),
+                mainContent: document.getElementById('main-content'),
+                galleryPage: document.getElementById('gallery-page'),
+                viewFullGalleryBtn: document.getElementById('view-full-gallery-btn'),
+                recentGallery: document.getElementById('recent-gallery-container'),
+                fullGallery: document.getElementById('full-gallery-container'),
+                filterButtons: document.getElementById('filter-buttons'),
+                modal: document.getElementById('imageModal'),
+                closeModalBtn: document.getElementById('closeModalBtn'),
+                modalImg: document.getElementById('modalImage'),
+                prevBtn: document.getElementById('prevBtn'),
+                nextBtn: document.getElementById('nextBtn'),
+                loreContainer: document.getElementById('lore-container'),
+                yearSpan: document.getElementById('year'),
+            };
 
-        const state = {
-            allArtwork: [], categories: [], modalGallery: [], currentModalIndex: 0,
-        };
+            const state = {
+                allArtwork: [],
+                categories: [],
+                modalGallery: [],
+                currentModalIndex: 0,
+            };
 
-        const config = {
-            storageContainerUrl: "https://noxkuuimages.blob.core.windows.net/artworks",
-            geminiApiKey: "PASTE_YOUR_GEMINI_API_KEY_HERE"
-        };
+            const config = {
+                storageContainerUrl: "https://noxkuuimages.blob.core.windows.net/artworks",
+                geminiApiKey: "AIzaSyAgl2kPBCxQJg4PVY9kwIPpl22dT8iFRC8"
+            };
 
-        /**
-         * Data Fetching & Processing
-         */
-        async function fetchArtworkData() {
-            try {
-                const containerClient = new azblob.ContainerClient(config.storageContainerUrl);
-                const artworkList = [];
-                for await (const blob of containerClient.listBlobsFlat()) {
-                    const { name: filename } = blob;
-                    const parts = filename.split('.')[0].split('-');
-                    if (parts.length >= 2) {
-                        const category = parts[0].toLowerCase().replace(/\s+/g, '-');
-                        const imageName = parts.slice(1).join(' ');
-                        artworkList.push({
-                            src: `${config.storageContainerUrl}/${filename}`,
-                            alt: `Artwork of ${imageName}`, category,
-                            flavorText: `${imageName} from ${parts[0]}`
-                        });
+            // --- UI & Page Logic ---
+            const applyTheme = (theme) => {
+                const lightIcon = document.getElementById('theme-toggle-light-icon');
+                const darkIcon = document.getElementById('theme-toggle-dark-icon');
+                if (theme === 'dark') {
+                    document.documentElement.classList.add('dark');
+                    lightIcon.style.display = 'block';
+                    darkIcon.style.display = 'none';
+                } else {
+                    document.documentElement.classList.remove('dark');
+                    lightIcon.style.display = 'none';
+                    darkIcon.style.display = 'block';
+                }
+            };
+            
+            const showPage = (page) => {
+                dom.mainContent.style.display = page === 'main' ? 'block' : 'none';
+                dom.galleryPage.style.display = page === 'gallery' ? 'block' : 'none';
+                window.scrollTo(0, 0);
+            };
+
+            const openModal = (element, nodeList, artworkData) => {
+                state.modalGallery = nodeList;
+                dom.modal.style.display = 'flex';
+                dom.modalImg.src = element.src;
+                state.currentModalIndex = state.modalGallery.findIndex(img => img.src === element.src);
+                document.body.style.overflow = 'hidden';
+                fetchAndDisplayLore(artworkData);
+            };
+
+            const closeModal = () => {
+                dom.modal.style.display = 'none';
+                document.body.style.overflow = '';
+            };
+
+            const changeImage = (direction) => {
+                state.currentModalIndex = (state.currentModalIndex + direction + state.modalGallery.length) % state.modalGallery.length;
+                const newImgSrc = state.modalGallery[state.currentModalIndex].src;
+                dom.modalImg.src = newImgSrc;
+                const newArtworkData = state.allArtwork.find(art => art.src === newImgSrc);
+                fetchAndDisplayLore(newArtworkData);
+            };
+
+            // --- Data Fetching & Rendering ---
+            const populateGalleries = () => {
+                dom.recentGallery.innerHTML = '';
+                state.allArtwork.slice(0, 6).forEach(art => dom.recentGallery.appendChild(createGalleryItem(art)));
+                dom.fullGallery.innerHTML = '';
+                state.allArtwork.forEach(art => dom.fullGallery.appendChild(createGalleryItem(art)));
+            };
+
+            const createGalleryItem = (artwork) => {
+                const img = document.createElement('img');
+                img.src = artwork.src;
+                img.alt = artwork.alt;
+                img.className = 'rounded-lg border border-themed hover:border-violet-300 dark:hover:border-violet-500 transition-all duration-300 cursor-pointer w-full';
+                img.onclick = () => openModal(img, Array.from(img.closest('.gallery-masonry').querySelectorAll('.gallery-item:not([style*="display: none"]) img')), artwork);
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'gallery-item';
+                itemDiv.dataset.category = artwork.category;
+                itemDiv.appendChild(img);
+                return itemDiv;
+            };
+
+            const createFilterButtons = () => {
+                dom.filterButtons.innerHTML = '';
+                state.categories.forEach(cat => {
+                    const button = document.createElement('button');
+                    button.textContent = cat;
+                    button.className = 'filter-btn px-4 py-2 text-sm md:text-base font-semibold rounded-lg transition-colors duration-200';
+                    button.dataset.filter = cat.toLowerCase().replace(/\s+/g, '-');
+                    button.classList.add(cat === 'All' ? 'bg-accent text-white' : 'bg-inactive-filter hover-bg-inactive-filter');
+                    dom.filterButtons.appendChild(button);
+                });
+            };
+
+            const filterGallery = (filter) => {
+                dom.fullGallery.querySelectorAll('.gallery-item').forEach(item => {
+                    item.style.display = (filter === 'all' || item.dataset.category === filter) ? 'block' : 'none';
+                });
+            };
+
+            async function fetchArtworkData() {
+                try {
+                    const containerClient = new azblob.ContainerClient(config.storageContainerUrl);
+                    const artworkList = [];
+                    for await (const blob of containerClient.listBlobsFlat()) {
+                        const { name: filename } = blob;
+                        const parts = filename.split('.')[0].split('-');
+                        if (parts.length >= 2) {
+                            const category = parts[0].toLowerCase().replace(/\s+/g, '-');
+                            const imageName = parts.slice(1).join(' ');
+                            artworkList.push({
+                                src: `${config.storageContainerUrl}/${filename}`,
+                                alt: `Artwork of ${imageName}`, category,
+                                flavorText: `${imageName} from ${parts[0]}`
+                            });
+                        }
                     }
+                    state.allArtwork = artworkList.reverse();
+                    const uniqueCategories = ['All', ...new Set(state.allArtwork.map(art => {
+                        const cat = art.category.toLowerCase();
+                        return cat === 'dc' ? 'DC' : cat.charAt(0).toUpperCase() + cat.slice(1).replace(/-/g, ' ');
+                    }))];
+                    state.categories = uniqueCategories;
+                } catch (error) {
+                    console.error("Error fetching artwork from Azure Blob Storage:", error);
+                    dom.recentGallery.innerHTML = "<p class='text-red-500 text-center'>Could not load artwork. Please ensure the storage account is configured for public access and CORS is set up.</p>";
                 }
-                state.allArtwork = artworkList.reverse();
+            }
+
+            async function getGeminiTextResponse(prompt) {
+                if (!config.geminiApiKey || config.geminiApiKey === "PASTE_YOUR_GEMINI_API_KEY_HERE") {
+                    return "API Key is missing. Please add it to the script.";
+                }
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${config.geminiApiKey}`;
+                const payload = { contents: [{ parts: [{ text: prompt }] }] };
+
+                try {
+                    const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                    if (!response.ok) throw new Error(`API call failed with status: ${response.status}`);
+                    const result = await response.json();
+                    if (result.candidates && result.candidates[0]?.content?.parts[0]) {
+                        return result.candidates[0].content.parts[0].text;
+                    }
+                    console.error('Invalid response structure:', result);
+                    return "Could not retrieve lore at this time.";
+                } catch (error) {
+                    console.error('Error calling Gemini API:', error);
+                    return "An error occurred while contacting the AI. Please try again later.";
+                }
+            }
+            
+            async function fetchAndDisplayLore(artwork) {
+                if (artwork.category === 'original') {
+                    dom.loreContainer.innerHTML = '<p class="font-body-alt text-xl">A unique creation by NoxKuu.</p>';
+                    return;
+                }
+                dom.loreContainer.innerHTML = '<p class="animate-pulse font-body-alt text-xl">Fetching lore from the archives...</p>';
+                const prompt = `Directly provide a brief, interesting lore snippet (under 80 words) for the following character: ${artwork.flavorText || artwork.alt}. Do not add any introductory phrases like "Certainly, here is the lore...". Just provide the lore itself. Focus on their origin or a key defining trait.`;
+                const loreText = await getGeminiTextResponse(prompt);
+                dom.loreContainer.innerHTML = `<p class="font-body-alt text-xl leading-relaxed">${loreText}</p>`;
+            }
+            
+            function setupEventListeners() {
+                dom.viewFullGalleryBtn.addEventListener('click', () => showPage('gallery'));
+                dom.homeLink.addEventListener('click', (e) => { e.preventDefault(); showPage('main'); });
+
+                dom.themeToggle.addEventListener('click', () => {
+                    const newTheme = document.documentElement.classList.contains('dark') ? 'light' : 'dark';
+                    localStorage.setItem('theme', newTheme);
+                    applyTheme(newTheme);
+                });
+
+                dom.filterButtons.addEventListener('click', (e) => {
+                    if (e.target.classList.contains('filter-btn')) {
+                        dom.filterButtons.querySelectorAll('.filter-btn').forEach(btn => {
+                            btn.classList.remove('bg-accent', 'text-white');
+                            btn.classList.add('bg-inactive-filter', 'hover-bg-inactive-filter');
+                        });
+                        e.target.classList.add('bg-accent', 'text-white');
+                        e.target.classList.remove('bg-inactive-filter', 'hover-bg-inactive-filter');
+                        filterGallery(e.target.dataset.filter);
+                    }
+                });
                 
-                const uniqueCategories = ['All', ...new Set(state.allArtwork.map(art => {
-                    const cat = art.category.toLowerCase();
-                    return cat === 'dc' ? 'DC' : cat.charAt(0).toUpperCase() + cat.slice(1).replace(/-/g, ' ');
-                }))];
-                state.categories = uniqueCategories;
-
-            } catch (error) {
-                console.error("Error fetching artwork from Azure Blob Storage:", error);
-                dom.recentGallery.innerHTML = "<p class='text-red-500 text-center'>Could not load artwork. Please ensure the storage account is configured for public access and CORS is set up.</p>";
+                dom.closeModalBtn.addEventListener('click', closeModal);
+                dom.modal.addEventListener('click', (e) => { if (e.target === dom.modal) closeModal(); });
+                dom.prevBtn.addEventListener('click', (e) => { e.stopPropagation(); changeImage(-1); });
+                dom.nextBtn.addEventListener('click', (e) => { e.stopPropagation(); changeImage(1); });
+                
+                document.addEventListener('keydown', (e) => {
+                    if (dom.modal.style.display === 'flex') {
+                        if (e.key === 'Escape') closeModal();
+                        if (e.key === 'ArrowLeft') changeImage(-1);
+                        if (e.key === 'ArrowRight') changeImage(1);
+                    }
+                });
             }
-        }
-        
-        async function getGeminiTextResponse(prompt) {
-            if (!config.geminiApiKey || config.geminiApiKey === "PASTE_YOUR_GEMINI_API_KEY_HERE") {
-                return "API Key is missing. Please add it to the script.";
+
+            // --- Initializer ---
+            function run() {
+                dom.yearSpan.textContent = new Date().getFullYear();
+                applyTheme(localStorage.getItem('theme') || 'light');
+                fetchArtworkData().then(() => {
+                    if (state.allArtwork.length > 0) {
+                        populateGalleries();
+                        createFilterButtons();
+                    }
+                    setupEventListeners();
+                });
             }
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${config.geminiApiKey}`;
-            const payload = { contents: [{ parts: [{ text: prompt }] }] };
-
-            try {
-                const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-                if (!response.ok) throw new Error(`API call failed with status: ${response.status}`);
-                const result = await response.json();
-                if (result.candidates && result.candidates[0]?.content?.parts[0]) {
-                    return result.candidates[0].content.parts[0].text;
-                }
-                console.error('Invalid response structure:', result);
-                return "Could not retrieve lore at this time.";
-            } catch (error) {
-                console.error('Error calling Gemini API:', error);
-                return "An error occurred while contacting the AI. Please try again later.";
-            }
-        }
-        
-        async function fetchAndDisplayLore(artwork) {
-            if (artwork.category === 'original') {
-                dom.loreContainer.innerHTML = '<p class="font-body-alt text-xl">A unique creation by NoxKuu.</p>';
-                return;
-            }
-            dom.loreContainer.innerHTML = '<p class="animate-pulse font-body-alt text-xl">Fetching lore from the archives...</p>';
-            const prompt = `Directly provide a brief, interesting lore snippet (under 80 words) for the following character: ${artwork.flavorText || artwork.alt}. Do not add any introductory phrases like "Certainly, here is the lore...". Just provide the lore itself. Focus on their origin or a key defining trait.`;
-            const loreText = await getGeminiTextResponse(prompt);
-            dom.loreContainer.innerHTML = `<p class="font-body-alt text-xl leading-relaxed">${loreText}</p>`;
-        }
-
-        /**
-         * UI Rendering Functions
-         */
-        const createGalleryItem = (artwork) => {
-            const img = document.createElement('img');
-            img.src = artwork.src;
-            img.alt = artwork.alt;
-            img.className = 'rounded-lg border border-themed hover:border-violet-300 dark:hover:border-violet-500 transition-all duration-300 cursor-pointer w-full';
-            img.onclick = () => openModal(img, Array.from(img.closest('.gallery-masonry').querySelectorAll('.gallery-item:not([style*="display: none"]) img')), artwork);
-            const itemDiv = document.createElement('div');
-            itemDiv.className = 'gallery-item';
-            itemDiv.dataset.category = artwork.category;
-            itemDiv.appendChild(img);
-            return itemDiv;
-        };
-
-        const populateGalleries = () => {
-            dom.recentGallery.innerHTML = '';
-            state.allArtwork.slice(0, 6).forEach(art => dom.recentGallery.appendChild(createGalleryItem(art)));
-            dom.fullGallery.innerHTML = '';
-            state.allArtwork.forEach(art => dom.fullGallery.appendChild(createGalleryItem(art)));
-        };
-        
-        const createFilterButtons = () => {
-            dom.filterButtons.innerHTML = '';
-            state.categories.forEach(cat => {
-                const button = document.createElement('button');
-                button.textContent = cat;
-                button.className = 'filter-btn px-4 py-2 text-sm md:text-base font-semibold rounded-lg transition-colors duration-200';
-                button.dataset.filter = cat.toLowerCase().replace(/\s+/g, '-');
-                button.classList.add(cat === 'All' ? 'bg-accent text-white' : 'bg-inactive-filter hover-bg-inactive-filter');
-                dom.filterButtons.appendChild(button);
-            });
-        };
-        
-        /**
-         * Event Handlers & Application Logic
-         */
-        const filterGallery = (filter) => {
-            dom.fullGallery.querySelectorAll('.gallery-item').forEach(item => {
-                item.style.display = (filter === 'all' || item.dataset.category === filter) ? 'block' : 'none';
-            });
-        };
-
-        const showPage = (page) => {
-            dom.mainContent.style.display = page === 'main' ? 'block' : 'none';
-            dom.galleryPage.style.display = page === 'gallery' ? 'block' : 'none';
-            window.scrollTo(0, 0);
-        };
-
-        const applyTheme = (theme) => {
-            const lightIcon = document.getElementById('theme-toggle-light-icon');
-            const darkIcon = document.getElementById('theme-toggle-dark-icon');
-            if (theme === 'dark') {
-                document.documentElement.classList.add('dark');
-                lightIcon.style.display = 'block';
-                darkIcon.style.display = 'none';
-            } else {
-                document.documentElement.classList.remove('dark');
-                lightIcon.style.display = 'none';
-                darkIcon.style.display = 'block';
-            }
-        };
-
-        const openModal = (element, nodeList, artworkData) => {
-            state.modalGallery = nodeList;
-            dom.modal.style.display = 'flex';
-            dom.modalImg.src = element.src;
-            state.currentModalIndex = state.modalGallery.findIndex(img => img.src === element.src);
-            document.body.style.overflow = 'hidden';
-            fetchAndDisplayLore(artworkData);
-        };
-
-        const closeModal = () => {
-            dom.modal.style.display = 'none';
-            document.body.style.overflow = '';
-        };
-
-        const changeImage = (direction) => {
-            state.currentModalIndex = (state.currentModalIndex + direction + state.modalGallery.length) % state.modalGallery.length;
-            const newImgSrc = state.modalGallery[state.currentModalIndex].src;
-            dom.modalImg.src = newImgSrc;
-            const newArtworkData = state.allArtwork.find(art => art.src === newImgSrc);
-            fetchAndDisplayLore(newArtworkData);
-        };
-
-        function setupEventListeners() {
-            dom.viewFullGalleryBtn.addEventListener('click', () => showPage('gallery'));
-            dom.homeLink.addEventListener('click', (e) => { e.preventDefault(); showPage('main'); });
-
-            dom.themeToggle.addEventListener('click', () => {
-                const newTheme = document.documentElement.classList.contains('dark') ? 'light' : 'dark';
-                localStorage.setItem('theme', newTheme);
-                applyTheme(newTheme);
-            });
-
-            dom.filterButtons.addEventListener('click', (e) => {
-                if (e.target.classList.contains('filter-btn')) {
-                    dom.filterButtons.querySelectorAll('.filter-btn').forEach(btn => {
-                        btn.classList.remove('bg-accent', 'text-white');
-                        btn.classList.add('bg-inactive-filter', 'hover-bg-inactive-filter');
-                    });
-                    e.target.classList.add('bg-accent', 'text-white');
-                    e.target.classList.remove('bg-inactive-filter', 'hover-bg-inactive-filter');
-                    filterGallery(e.target.dataset.filter);
-                }
-            });
             
-            dom.closeModalBtn.addEventListener('click', closeModal);
-            dom.modal.addEventListener('click', (e) => { if (e.target === dom.modal) closeModal(); });
-            dom.prevBtn.addEventListener('click', (e) => { e.stopPropagation(); changeImage(-1); });
-            dom.nextBtn.addEventListener('click', (e) => { e.stopPropagation(); changeImage(1); });
-            
-            document.addEventListener('keydown', (e) => {
-                if (dom.modal.style.display === 'flex') {
-                    if (e.key === 'Escape') closeModal();
-                    if (e.key === 'ArrowLeft') changeImage(-1);
-                    if (e.key === 'ArrowRight') changeImage(1);
-                }
-            });
-        }
-        
-        /**
-         * App Initializer
-         * Waits for the browser to be ready, then starts the main application logic.
-         */
-        function startAppOnLoad() {
-            // This function checks if the required `azblob` library is loaded.
-            // It will keep checking every 100ms until it's available.
-            if (typeof azblob !== 'undefined') {
-                initializeApp();
-            } else {
-                setTimeout(startAppOnLoad, 100);
-            }
-        }
-        
-        // Start the app once the page is fully loaded.
-        window.onload = startAppOnLoad;
-
+            run();
+        });
     </script>
 </body>
 </html>
