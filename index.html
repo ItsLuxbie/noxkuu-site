@@ -131,39 +131,30 @@
     </div>
 
     <!-- JAVASCRIPT LOGIC -->
-    <script src="https://cdn.jsdelivr.net/npm/@azure/storage-blob@12.11.0/dist/storage-blob.min.js"></script>
     <script>
-        // This is a more robust way to start the app. It ensures all external scripts
-        // are loaded before our main logic runs.
-        window.addEventListener('load', () => {
-            initializeApp();
-        });
+        function loadScript(src, callback) {
+            const script = document.createElement('script');
+            script.src = src;
+            script.onload = () => callback();
+            script.onerror = () => console.error(`Failed to load script: ${src}`);
+            document.head.appendChild(script);
+        }
 
         function initializeApp() {
             // --- App State & Configuration ---
             const dom = {
-                themeToggle: document.getElementById('theme-toggle'),
-                homeLink: document.getElementById('homeLink'),
-                mainContent: document.getElementById('main-content'),
-                galleryPage: document.getElementById('gallery-page'),
-                viewFullGalleryBtn: document.getElementById('view-full-gallery-btn'),
-                recentGallery: document.getElementById('recent-gallery-container'),
-                fullGallery: document.getElementById('full-gallery-container'),
-                filterButtons: document.getElementById('filter-buttons'),
-                modal: document.getElementById('imageModal'),
-                closeModalBtn: document.getElementById('closeModalBtn'),
-                modalImg: document.getElementById('modalImage'),
-                prevBtn: document.getElementById('prevBtn'),
-                nextBtn: document.getElementById('nextBtn'),
-                loreContainer: document.getElementById('lore-container'),
+                themeToggle: document.getElementById('theme-toggle'), homeLink: document.getElementById('homeLink'),
+                mainContent: document.getElementById('main-content'), galleryPage: document.getElementById('gallery-page'),
+                viewFullGalleryBtn: document.getElementById('view-full-gallery-btn'), recentGallery: document.getElementById('recent-gallery-container'),
+                fullGallery: document.getElementById('full-gallery-container'), filterButtons: document.getElementById('filter-buttons'),
+                modal: document.getElementById('imageModal'), closeModalBtn: document.getElementById('closeModalBtn'),
+                modalImg: document.getElementById('modalImage'), prevBtn: document.getElementById('prevBtn'),
+                nextBtn: document.getElementById('nextBtn'), loreContainer: document.getElementById('lore-container'),
                 yearSpan: document.getElementById('year'),
             };
 
             const state = {
-                allArtwork: [],
-                categories: [],
-                modalGallery: [],
-                currentModalIndex: 0,
+                allArtwork: [], categories: [], modalGallery: [], currentModalIndex: 0,
             };
 
             const config = {
@@ -255,8 +246,7 @@
 
             async function fetchArtworkData() {
                 if (typeof azblob === 'undefined') {
-                    console.error("Azure SDK (azblob) is not loaded. Cannot fetch artwork.");
-                    dom.recentGallery.innerHTML = "<p class='text-red-500 text-center'>Error: Required library did not load.</p>";
+                    console.error("Azure SDK (azblob) is not loaded yet. This should not happen if called correctly.");
                     return;
                 }
                 try {
@@ -357,15 +347,18 @@
             }
 
             // --- Initializer ---
-            dom.yearSpan.textContent = new Date().getFullYear();
-            applyTheme(localStorage.getItem('theme') || 'light');
-            fetchArtworkData().then(() => {
+            async function main() {
+                dom.yearSpan.textContent = new Date().getFullYear();
+                applyTheme(localStorage.getItem('theme') || 'light');
+                await fetchArtworkData();
                 if (state.allArtwork.length > 0) {
                     populateGalleries();
                     createFilterButtons();
                 }
                 setupEventListeners();
-            });
+            }
+
+            main();
         }
     </script>
 </body>
