@@ -8,83 +8,47 @@
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Google Fonts: Poppins, Permanent Marker, & Caveat -->
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Permanent+Marker&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <script>
-        // Tailwind dark mode configuration
-        tailwind.config = {
-            darkMode: 'class',
-        }
+        tailwind.config = { darkMode: 'class' };
     </script>
 
     <style>
-        /* Base styles for light mode */
         body {
             font-family: 'Poppins', sans-serif;
-            --bg-color: #fdf8f6; /* Pastel Cream */
-            --text-color: #57534e; /* Stone 600 */
-            --header-bg: rgba(253, 248, 246, 0.8);
-            --border-color: #e7e5e4; /* Stone 200 */
-            --accent-color: #a78bfa; /* Violet 400 */
-            --accent-hover-color: #8b5cf6; /* Violet 500 */
-            --inactive-filter-bg: #ffffff;
-            --inactive-filter-hover-bg: #f5f5f4; /* Stone 100 */
+            --bg-color: #fdf8f6; --text-color: #57534e; --header-bg: rgba(253, 248, 246, 0.8);
+            --border-color: #e7e5e4; --accent-color: #a78bfa; --accent-hover-color: #8b5cf6;
+            --inactive-filter-bg: #ffffff; --inactive-filter-hover-bg: #f5f5f4;
             @apply transition-colors duration-300;
         }
-
-        /* Dark mode overrides */
         .dark body {
-            --bg-color: #1c1917; /* Stone 900 */
-            --text-color: #d6d3d1; /* Stone 300 */
-            --header-bg: rgba(28, 25, 23, 0.8);
-            --border-color: #44403c; /* Stone 700 */
-            --accent-color: #a78bfa; /* Violet 400 */
-            --accent-hover-color: #c4b5fd; /* Violet 300 */
-            --inactive-filter-bg: #292524; /* Stone 800 */
-            --inactive-filter-hover-bg: #44403c; /* Stone 700 */
+            --bg-color: #1c1917; --text-color: #d6d3d1; --header-bg: rgba(28, 25, 23, 0.8);
+            --border-color: #44403c; --accent-hover-color: #c4b5fd; --inactive-filter-bg: #292524;
+            --inactive-filter-hover-bg: #44403c;
         }
-        
-        /* Font variables */
-        .font-heading {
-            font-family: 'Permanent Marker', cursive;
-        }
-        .font-body-alt {
-            font-family: 'Caveat', cursive;
-        }
-
-        /* Applying the CSS variables */
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-        }
-        .bg-header { background-color: var(--header-bg); }
-        .border-themed { border-color: var(--border-color); }
-        .text-accent { color: var(--accent-color); }
-        .bg-accent { background-color: var(--accent-color); }
+        .font-heading { font-family: 'Permanent Marker', cursive; }
+        .font-body-alt { font-family: 'Caveat', cursive; }
+        body { background-color: var(--bg-color); color: var(--text-color); }
+        .bg-header { background-color: var(--header-bg); } .border-themed { border-color: var(--border-color); }
+        .text-accent { color: var(--accent-color); } .bg-accent { background-color: var(--accent-color); }
         .hover-bg-accent:hover { background-color: var(--accent-hover-color); }
         .bg-inactive-filter { background-color: var(--inactive-filter-bg); }
         .hover-bg-inactive-filter:hover { background-color: var(--inactive-filter-hover-bg); }
-
-
-        /* Masonry layout for gallery */
         .gallery-masonry { column-gap: 1.5rem; }
         @media (min-width: 640px) { .gallery-masonry { column-count: 2; } }
         @media (min-width: 1024px) { .gallery-masonry { column-count: 3; } }
         .gallery-item { break-inside: avoid; margin-bottom: 1.5rem; }
-        
-        /* Modal styles */
         .modal-bg { background-color: rgba(253, 248, 246, 0.9); }
         .dark .modal-bg { background-color: rgba(28, 25, 23, 0.9); }
     </style>
 </head>
 <body class="overflow-x-hidden">
 
-    <!-- =================================================================
-    HEADER
-    ================================================================== -->
+    <!-- HEADER -->
     <header class="fixed top-0 left-0 right-0 z-50 bg-header backdrop-blur-md border-b border-themed">
         <div class="container mx-auto px-6 py-4 flex justify-between items-center">
             <a href="#" id="homeLink" class="text-2xl font-bold tracking-wider text-stone-800 dark:text-white font-heading">NOXKUU</a>
@@ -98,68 +62,41 @@
         </div>
     </header>
 
-    <!-- =================================================================
-    MAIN CONTENT (Landing Page)
-    ================================================================== -->
+    <!-- MAIN CONTENT (Landing Page) -->
     <div id="main-content">
         <main>
-            <!-- Hero Section -->
             <section class="text-center pt-32 pb-16 md:pt-48 md:pb-24 px-4">
                 <div class="z-10">
-                    <h1 class="font-heading text-5xl md:text-7xl lg:text-8xl font-bold text-stone-800 dark:text-white tracking-normal">
-                        Illustrating Cool Ideas.
-                    </h1>
-                    <p class="font-body-alt mt-4 text-2xl md:text-3xl text-stone-500 dark:text-stone-400 max-w-2xl mx-auto">
-                        A personal collection of whatever seems cool at the moment.
-                    </p>
+                    <h1 class="font-heading text-5xl md:text-7xl lg:text-8xl font-bold text-stone-800 dark:text-white tracking-normal">Illustrating Cool Ideas.</h1>
+                    <p class="font-body-alt mt-4 text-2xl md:text-3xl text-stone-500 dark:text-stone-400 max-w-2xl mx-auto">A personal collection of whatever seems cool at the moment.</p>
                 </div>
             </section>
 
-            <!-- Recent Work Section -->
             <section id="recent-work" class="py-20 md:py-32 bg-white dark:bg-[#111111]">
                 <div class="container mx-auto px-6">
-                    <h2 class="font-heading text-4xl md:text-5xl font-bold text-center mb-12 text-stone-800 dark:text-white">
-                        Recent <span class="text-accent">Work</span>
-                    </h2>
-                    <div id="recent-gallery-container" class="gallery-masonry">
-                        <!-- Recent gallery items will be dynamically inserted here -->
-                    </div>
+                    <h2 class="font-heading text-4xl md:text-5xl font-bold text-center mb-12 text-stone-800 dark:text-white">Recent <span class="text-accent">Work</span></h2>
+                    <div id="recent-gallery-container" class="gallery-masonry"></div>
                     <div class="text-center mt-16">
-                        <button id="view-full-gallery-btn" class="bg-accent hover-bg-accent text-white font-bold py-3 px-8 rounded-lg text-lg transition-colors duration-300 font-body-alt text-2xl">
-                            View Full Gallery
-                        </button>
+                        <button id="view-full-gallery-btn" class="bg-accent hover-bg-accent text-white font-bold py-3 px-8 rounded-lg text-lg transition-colors duration-300 font-body-alt text-2xl">View Full Gallery</button>
                     </div>
                 </div>
             </section>
         </main>
     </div>
 
-    <!-- =================================================================
-    FULL GALLERY PAGE (hidden by default)
-    ================================================================== -->
+    <!-- FULL GALLERY PAGE -->
     <div id="gallery-page" class="hidden">
         <section class="py-24 md:py-32">
             <div class="container mx-auto px-6">
-                <h2 class="font-heading text-4xl md:text-5xl font-bold text-center mb-4 text-stone-800 dark:text-white">
-                    Full <span class="text-accent">Gallery</span>
-                </h2>
+                <h2 class="font-heading text-4xl md:text-5xl font-bold text-center mb-4 text-stone-800 dark:text-white">Full <span class="text-accent">Gallery</span></h2>
                 <p class="text-center text-stone-500 dark:text-stone-400 mb-12">Filter by universe</p>
-
-                <!-- Filter Buttons -->
-                <div id="filter-buttons" class="flex flex-wrap justify-center gap-2 md:gap-4 mb-12">
-                    <!-- Filter buttons will be dynamically inserted here -->
-                </div>
-
-                <div id="full-gallery-container" class="gallery-masonry">
-                    <!-- Full gallery will be dynamically inserted here -->
-                </div>
+                <div id="filter-buttons" class="flex flex-wrap justify-center gap-2 md:gap-4 mb-12"></div>
+                <div id="full-gallery-container" class="gallery-masonry"></div>
             </div>
         </section>
     </div>
     
-    <!-- =================================================================
-    FOOTER
-    ================================================================== -->
+    <!-- FOOTER -->
     <footer id="contact" class="bg-stone-800 dark:bg-black py-12">
         <div class="container mx-auto px-6 text-center text-stone-400">
             <p class="font-heading text-3xl font-bold tracking-wider text-white mb-4">NOXKUU</p>
@@ -173,155 +110,131 @@
         </div>
     </footer>
 
-    <!-- =================================================================
-    MODAL
-    ================================================================== -->
+    <!-- MODAL -->
     <div id="imageModal" class="fixed top-0 left-0 w-full h-full modal-bg items-center justify-center p-4 z-[100] hidden">
         <div class="relative w-full max-w-7xl h-full flex flex-col md:flex-row items-center justify-center gap-8">
-            <!-- Main Image Display -->
             <div class="relative w-full md:w-2/3 h-full flex items-center justify-center">
-                <button id="prevBtn" class="absolute left-0 text-stone-700 dark:text-stone-200 text-4xl p-2 rounded-full bg-white/50 dark:bg-black/30 hover:bg-white/80 dark:hover:bg-black/50 transition-colors">
-                    &#10094;
-                </button>
+                <button id="prevBtn" class="absolute left-0 text-stone-700 dark:text-stone-200 text-4xl p-2 rounded-full bg-white/50 dark:bg-black/30 hover:bg-white/80 dark:hover:bg-black/50 transition-colors">&#10094;</button>
                 <img id="modalImage" src="" alt="Full-size artwork" class="max-w-full max-h-[90vh] object-contain rounded-lg shadow-2xl">
-                <button id="nextBtn" class="absolute right-0 text-stone-700 dark:text-stone-200 text-4xl p-2 rounded-full bg-white/50 dark:bg-black/30 hover:bg-white/80 dark:hover:bg-black/50 transition-colors">
-                    &#10095;
-                </button>
+                <button id="nextBtn" class="absolute right-0 text-stone-700 dark:text-stone-200 text-4xl p-2 rounded-full bg-white/50 dark:bg-black/30 hover:bg-white/80 dark:hover:bg-black/50 transition-colors">&#10095;</button>
             </div>
-            <!-- Character Lore Panel -->
             <div class="w-full md:w-1/3 h-auto md:h-full flex flex-col justify-center text-left p-4">
                 <button id="closeModalBtn" class="absolute top-0 right-0 p-2 z-[110] rounded-full hover:bg-black/10 dark:hover:bg-white/10 transition-colors">
                     <span class="text-stone-800 dark:text-white text-5xl font-bold cursor-pointer leading-none">&times;</span>
                 </button>
                 <div id="lore-panel" class="bg-white dark:bg-stone-800/50 p-6 rounded-lg shadow-lg border border-themed h-full overflow-y-auto">
                     <h3 class="font-heading text-3xl text-stone-800 dark:text-white">Character Lore</h3>
-                    <div id="lore-container" class="mt-4 text-stone-600 dark:text-stone-300 space-y-2 leading-relaxed">
-                        <!-- AI responses will be injected here -->
-                    </div>
+                    <div id="lore-container" class="mt-4 text-stone-600 dark:text-stone-300 space-y-2 leading-relaxed"></div>
                 </div>
             </div>
         </div>
     </div>
 
-
-    <!-- =================================================================
-    JAVASCRIPT LOGIC
-    ================================================================== -->
+    <!-- JAVASCRIPT LOGIC -->
+    <script src="https://cdn.jsdelivr.net/npm/@azure/storage-blob@12.11.0/dist/storage-blob.min.js"></script>
     <script>
-        // --- DOM ELEMENTS ---
-        const themeToggleBtn = document.getElementById('theme-toggle');
-        const homeLink = document.getElementById('homeLink');
-        const mainContent = document.getElementById('main-content');
-        const galleryPage = document.getElementById('gallery-page');
-        const viewFullGalleryBtn = document.getElementById('view-full-gallery-btn');
-        const recentGalleryContainer = document.getElementById('recent-gallery-container');
-        const fullGalleryContainer = document.getElementById('full-gallery-container');
-        const filterButtonsContainer = document.getElementById('filter-buttons');
-        const modal = document.getElementById('imageModal');
-        const closeModalBtn = document.getElementById('closeModalBtn');
-        const modalImg = document.getElementById('modalImage');
-        const prevBtn = document.getElementById('prevBtn');
-        const nextBtn = document.getElementById('nextBtn');
-        const loreContainer = document.getElementById('lore-container');
+        const domElements = {
+            themeToggle: document.getElementById('theme-toggle'), homeLink: document.getElementById('homeLink'),
+            mainContent: document.getElementById('main-content'), galleryPage: document.getElementById('gallery-page'),
+            viewFullGalleryBtn: document.getElementById('view-full-gallery-btn'), recentGallery: document.getElementById('recent-gallery-container'),
+            fullGallery: document.getElementById('full-gallery-container'), filterButtons: document.getElementById('filter-buttons'),
+            modal: document.getElementById('imageModal'), closeModalBtn: document.getElementById('closeModalBtn'),
+            modalImg: document.getElementById('modalImage'), prevBtn: document.getElementById('prevBtn'),
+            nextBtn: document.getElementById('nextBtn'), loreContainer: document.getElementById('lore-container'),
+            yearSpan: document.getElementById('year'),
+        };
 
-        let galleryImagesForModal = [];
-        let currentImageIndex;
-        let ALL_ARTWORK = []; 
-        let CATEGORIES = []; 
-        let currentArtworkInModal;
+        let ALL_ARTWORK = []; let CATEGORIES = [];
+        let galleryImagesForModal = []; let currentImageIndex;
 
-        // --- GEMINI API FUNCTION ---
-        async function getGeminiTextResponse(prompt) {
-            // IMPORTANT: Add your Gemini API key here.
-            const apiKey = "AIzaSyAgl2kPBCxQJg4PVY9kwIPpl22dT8iFRC8";
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
-            const payload = { contents: [{ parts: [{ text: prompt }] }] };
+        // --- CORE LOGIC ---
+        async function initializeApp() {
+            domElements.yearSpan.textContent = new Date().getFullYear();
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            applyTheme(savedTheme);
+            await fetchArtworkData();
+            populateGalleries();
+            createFilterButtons();
+            setupEventListeners();
+        }
 
+        async function fetchArtworkData() {
+            // IMPORTANT: Replace with your actual Azure Storage Account URL
+            const storageAccountUrl = "https://noxkuuimages.blob.core.windows.net";
+            const containerName = "artworks";
+            
             try {
-                const response = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                if (!response.ok) {
-                   throw new Error(`API call failed with status: ${response.status}`);
+                const blobServiceClient = new azblob.BlobServiceClient(storageAccountUrl);
+                const containerClient = blobServiceClient.getContainerClient(containerName);
+                
+                const artworkList = [];
+                for await (const blob of containerClient.listBlobsFlat()) {
+                    const { name: filename } = blob;
+                    const parts = filename.split('.')[0].split('-');
+                    if (parts.length >= 2) {
+                        const category = parts[0].toLowerCase().replace(/\s+/g, '-');
+                        const imageName = parts.slice(1).join(' ');
+                        artworkList.push({
+                            src: `${storageAccountUrl}/${containerName}/${filename}`,
+                            alt: `Artwork of ${imageName}`, category,
+                            flavorText: `${imageName} from ${parts[0]}`
+                        });
+                    }
                 }
-                const result = await response.json();
+                ALL_ARTWORK = artworkList.reverse(); // Newest first
+                const uniqueCategories = ['All', ...new Set(ALL_ARTWORK.map(art => {
+                    const cat = art.category.toLowerCase();
+                    return cat === 'dc' ? 'DC' : cat.charAt(0).toUpperCase() + cat.slice(1).replace(/-/g, ' ');
+                }))];
+                CATEGORIES = uniqueCategories;
 
-                if (result.candidates && result.candidates[0].content && result.candidates[0].content.parts[0]) {
-                    return result.candidates[0].content.parts[0].text;
-                } else {
-                    console.error('Invalid response structure from Gemini API:', result);
-                    return "Could not retrieve lore at this time.";
-                }
             } catch (error) {
-                console.error('Error calling Gemini API:', error);
-                return "An error occurred while contacting the AI. Please try again later.";
+                console.error("Error fetching artwork from Azure Blob Storage:", error);
+                domElements.recentGallery.innerHTML = "<p class='text-red-500 text-center'>Could not load artwork. Please ensure the storage account is configured for public access.</p>";
             }
         }
-        
-        async function fetchAndDisplayLore(artwork) {
-            if (artwork.category === 'original') {
-                loreContainer.innerHTML = '<p class="font-body-alt text-xl">A unique creation by NoxKuu.</p>';
-                return;
-            }
 
-            loreContainer.innerHTML = '<p class="animate-pulse font-body-alt text-xl">Fetching lore from the archives...</p>';
-            
-            const prompt = `Directly provide a brief, interesting lore snippet (under 80 words) for the following character: ${artwork.flavorText || artwork.alt}. Do not add any introductory phrases like "Certainly, here is the lore...". Just provide the lore itself. Focus on their origin or a key defining trait.`;
-            const loreText = await getGeminiTextResponse(prompt);
-            
-            loreContainer.innerHTML = `<p class="font-body-alt text-xl leading-relaxed">${loreText}</p>`;
-        }
-        
+        const populateGalleries = () => {
+            domElements.recentGallery.innerHTML = '';
+            ALL_ARTWORK.slice(0, 6).forEach(art => domElements.recentGallery.appendChild(createGalleryItem(art)));
+            domElements.fullGallery.innerHTML = '';
+            ALL_ARTWORK.forEach(art => domElements.fullGallery.appendChild(createGalleryItem(art)));
+        };
 
-        // --- CORE FUNCTIONS ---
         const createGalleryItem = (artwork) => {
             const img = document.createElement('img');
             img.src = artwork.src;
             img.alt = artwork.alt;
             img.className = 'rounded-lg border border-themed hover:border-violet-300 dark:hover:border-violet-500 transition-all duration-300 cursor-pointer w-full';
             img.onclick = () => openModal(img, Array.from(img.closest('.gallery-masonry').querySelectorAll('.gallery-item:not([style*="display: none"]) img')), artwork);
-            
             const itemDiv = document.createElement('div');
             itemDiv.className = 'gallery-item';
-            itemDiv.setAttribute('data-category', artwork.category);
+            itemDiv.dataset.category = artwork.category;
             itemDiv.appendChild(img);
             return itemDiv;
         };
-
-        const populateGalleries = () => {
-            recentGalleryContainer.innerHTML = '';
-            ALL_ARTWORK.slice(0, 6).forEach(art => recentGalleryContainer.appendChild(createGalleryItem(art)));
-            fullGalleryContainer.innerHTML = '';
-            ALL_ARTWORK.forEach(art => fullGalleryContainer.appendChild(createGalleryItem(art)));
-        };
-
+        
         const createFilterButtons = () => {
-            filterButtonsContainer.innerHTML = ''; // Clear previous buttons
+            domElements.filterButtons.innerHTML = '';
             CATEGORIES.forEach(cat => {
                 const button = document.createElement('button');
                 button.textContent = cat;
                 button.className = 'filter-btn px-4 py-2 text-sm md:text-base font-semibold rounded-lg transition-colors duration-200';
                 button.dataset.filter = cat.toLowerCase().replace(/\s+/g, '-');
-                if (cat === 'All') {
-                    button.classList.add('bg-accent', 'text-white');
-                } else {
-                    button.classList.add('bg-inactive-filter', 'hover-bg-inactive-filter');
-                }
-                filterButtonsContainer.appendChild(button);
+                button.classList.add(cat === 'All' ? 'bg-accent text-white' : 'bg-inactive-filter hover-bg-inactive-filter');
+                domElements.filterButtons.appendChild(button);
             });
         };
-
+        
         const filterGallery = (filter) => {
-            fullGalleryContainer.querySelectorAll('.gallery-item').forEach(item => {
+            domElements.fullGallery.querySelectorAll('.gallery-item').forEach(item => {
                 item.style.display = (filter === 'all' || item.dataset.category === filter) ? 'block' : 'none';
             });
         };
 
-        const showPage = (pageToShow) => {
-            mainContent.style.display = pageToShow === 'main' ? 'block' : 'none';
-            galleryPage.style.display = pageToShow === 'gallery' ? 'block' : 'none';
+        const showPage = (page) => {
+            domElements.mainContent.style.display = page === 'main' ? 'block' : 'none';
+            domElements.galleryPage.style.display = page === 'gallery' ? 'block' : 'none';
             window.scrollTo(0, 0);
         };
 
@@ -339,112 +252,104 @@
             }
         };
 
-        const openModal = (element, galleryNodeList, artworkData) => {
-            currentArtworkInModal = artworkData;
-            galleryImagesForModal = galleryNodeList;
-            modal.style.display = 'flex';
-            modalImg.src = element.src;
+        const openModal = (element, nodeList, artworkData) => {
+            galleryImagesForModal = nodeList;
+            domElements.modal.style.display = 'flex';
+            domElements.modalImg.src = element.src;
             currentImageIndex = galleryImagesForModal.findIndex(img => img.src === element.src);
             document.body.style.overflow = 'hidden';
-
-            fetchAndDisplayLore(currentArtworkInModal);
+            fetchAndDisplayLore(artworkData);
         };
 
         const closeModal = () => {
-            modal.style.display = 'none';
+            domElements.modal.style.display = 'none';
             document.body.style.overflow = '';
         };
 
         const changeImage = (direction) => {
             currentImageIndex = (currentImageIndex + direction + galleryImagesForModal.length) % galleryImagesForModal.length;
             const newImgSrc = galleryImagesForModal[currentImageIndex].src;
-            modalImg.src = newImgSrc;
-            
-            // Find new artwork data and fetch lore
-            currentArtworkInModal = ALL_ARTWORK.find(art => art.src === newImgSrc);
-            fetchAndDisplayLore(currentArtworkInModal);
+            domElements.modalImg.src = newImgSrc;
+            const newArtworkData = ALL_ARTWORK.find(art => art.src === newImgSrc);
+            fetchAndDisplayLore(newArtworkData);
         };
-        
 
-        // --- INITIALIZATION ---
-        document.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('year').textContent = new Date().getFullYear();
-            
-            // Using a placeholder JSON for now. Replace with your actual gallery-data.json
-            const placeholderData = {
-                artwork: [
-                    { src: 'https://placehold.co/600x800/e2e8f0/64748b?text=Phoenix', alt: 'Artwork of Phoenix', category: 'marvel', flavorText: 'Jean Grey as the cosmic entity Dark Phoenix' },
-                    { src: 'https://placehold.co/600x600/e2e8f0/64748b?text=Daredevil', alt: 'Artwork of Daredevil', category: 'marvel', flavorText: 'Matt Murdock, the Daredevil of Hell\'s Kitchen' },
-                    { src: 'https://placehold.co/600x750/e2e8f0/64748b?text=Moon+Knight', alt: 'Artwork of Moon Knight', category: 'marvel', flavorText: 'Marc Spector, the avatar of the Egyptian moon god Khonshu' },
-                    { src: 'https://placehold.co/600x900/e2e8f0/64748b?text=Cassandra+Cain', alt: 'Artwork of Cassandra Cain', category: 'dc', flavorText: 'Cassandra Cain as Batgirl, one of the world\'s greatest martial artists' },
-                    { src: 'https://placehold.co/600x700/e2e8f0/64748b?text=Superboy', alt: 'Artwork of Superboy', category: 'dc', flavorText: 'Kon-El, the clone of Superman from the Young Justice storyline' },
-                    { src: 'https://placehold.co/600x850/e2e8f0/64748b?text=Jedi', alt: 'Artwork of a Jedi', category: 'star-wars', flavorText: 'A Jedi Knight from the Star Wars Old Republic era' },
-                    { src: 'https://placehold.co/600x780/e2e8f0/64748b?text=Original+1', alt: 'Original character concept', category: 'original', flavorText: '' },
-                    { src: 'https://placehold.co/600x650/e2e8f0/64748b?text=Original+2', alt: 'Original creature design', category: 'original', flavorText: '' },
-                ]
-            };
-            
-            fetch('./gallery-data.json')
-                .then(response => response.ok ? response.json() : placeholderData)
-                .then(data => {
-                    ALL_ARTWORK = data.artwork;
-                    const uniqueCategories = ['All', ...new Set(ALL_ARTWORK.map(art => {
-                        const cat = art.category.toLowerCase();
-                        if (cat === 'dc') return 'DC';
-                        return cat.charAt(0).toUpperCase() + cat.slice(1).replace(/-/g, ' ');
-                    }))];
-                    CATEGORIES = uniqueCategories;
-                    
-                    populateGalleries();
-                    createFilterButtons();
+        // --- Event Listeners ---
+        function setupEventListeners() {
+            domElements.viewFullGalleryBtn.addEventListener('click', () => showPage('gallery'));
+            domElements.homeLink.addEventListener('click', (e) => { e.preventDefault(); showPage('main'); });
 
-                    filterButtonsContainer.addEventListener('click', (e) => {
-                        if (e.target.classList.contains('filter-btn')) {
-                            document.querySelectorAll('.filter-btn').forEach(btn => {
-                                btn.classList.remove('bg-accent', 'text-white');
-                                btn.classList.add('bg-inactive-filter', 'hover-bg-inactive-filter');
-                            });
-                            e.target.classList.add('bg-accent', 'text-white');
-                            e.target.classList.remove('bg-inactive-filter', 'hover-bg-inactive-filter');
-                            filterGallery(e.target.dataset.filter);
-                        }
-                    });
-                }).catch(error => {
-                    console.error('Error initializing gallery:', error);
-                    ALL_ARTWORK = placeholderData.artwork;
-                    const uniqueCategories = ['All', ...new Set(ALL_ARTWORK.map(art => {
-                       const cat = art.category.toLowerCase();
-                        if (cat === 'dc') return 'DC';
-                        return cat.charAt(0).toUpperCase() + cat.slice(1).replace(/-/g, ' ');
-                    }))];
-                    CATEGORIES = uniqueCategories;
-                    populateGalleries();
-                    createFilterButtons();
-                });
-            
-            const savedTheme = localStorage.getItem('theme') || 'light';
-            applyTheme(savedTheme);
-
-            viewFullGalleryBtn.addEventListener('click', () => showPage('gallery'));
-            homeLink.addEventListener('click', (e) => { e.preventDefault(); showPage('main'); });
-            themeToggleBtn.addEventListener('click', () => {
+            domElements.themeToggle.addEventListener('click', () => {
                 const newTheme = document.documentElement.classList.contains('dark') ? 'light' : 'dark';
                 localStorage.setItem('theme', newTheme);
                 applyTheme(newTheme);
             });
+
+            domElements.filterButtons.addEventListener('click', (e) => {
+                if (e.target.classList.contains('filter-btn')) {
+                    domElements.filterButtons.querySelectorAll('.filter-btn').forEach(btn => {
+                        btn.classList.remove('bg-accent', 'text-white');
+                        btn.classList.add('bg-inactive-filter', 'hover-bg-inactive-filter');
+                    });
+                    e.target.classList.add('bg-accent', 'text-white');
+                    e.target.classList.remove('bg-inactive-filter', 'hover-bg-inactive-filter');
+                    filterGallery(e.target.dataset.filter);
+                }
+            });
             
-            closeModalBtn.addEventListener('click', closeModal);
-            modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
-            prevBtn.addEventListener('click', (e) => { e.stopPropagation(); changeImage(-1); });
-            nextBtn.addEventListener('click', (e) => { e.stopPropagation(); changeImage(1); });
+            domElements.closeModalBtn.addEventListener('click', closeModal);
+            domElements.modal.addEventListener('click', (e) => { if (e.target === domElements.modal) closeModal(); });
+            domElements.prevBtn.addEventListener('click', (e) => { e.stopPropagation(); changeImage(-1); });
+            domElements.nextBtn.addEventListener('click', (e) => { e.stopPropagation(); changeImage(1); });
+            
             document.addEventListener('keydown', (e) => {
-                if (modal.style.display === 'flex') {
+                if (domElements.modal.style.display === 'flex') {
                     if (e.key === 'Escape') closeModal();
                     if (e.key === 'ArrowLeft') changeImage(-1);
                     if (e.key === 'ArrowRight') changeImage(1);
                 }
             });
-        });
+        }
+        
+        // --- Gemini API (Lore) Function ---
+        async function getGeminiTextResponse(prompt) {
+            const apiKey = "PASTE_YOUR_GEMINI_API_KEY_HERE";
+            if (!apiKey || apiKey === "PASTE_YOUR_GEMINI_API_KEY_HERE") {
+                return "API Key is missing. Please add it to the script.";
+            }
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+            const payload = { contents: [{ parts: [{ text: prompt }] }] };
+
+            try {
+                const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                if (!response.ok) throw new Error(`API call failed with status: ${response.status}`);
+                const result = await response.json();
+                if (result.candidates && result.candidates[0].content && result.candidates[0].content.parts[0]) {
+                    return result.candidates[0].content.parts[0].text;
+                } else {
+                    console.error('Invalid response structure:', result);
+                    return "Could not retrieve lore at this time.";
+                }
+            } catch (error) {
+                console.error('Error calling Gemini API:', error);
+                return "An error occurred while contacting the AI. Please try again later.";
+            }
+        }
+        
+        async function fetchAndDisplayLore(artwork) {
+            if (artwork.category === 'original') {
+                domElements.loreContainer.innerHTML = '<p class="font-body-alt text-xl">A unique creation by NoxKuu.</p>';
+                return;
+            }
+            domElements.loreContainer.innerHTML = '<p class="animate-pulse font-body-alt text-xl">Fetching lore from the archives...</p>';
+            const prompt = `Directly provide a brief, interesting lore snippet (under 80 words) for the following character: ${artwork.flavorText || artwork.alt}. Do not add any introductory phrases like "Certainly, here is the lore...". Just provide the lore itself. Focus on their origin or a key defining trait.`;
+            const loreText = await getGeminiTextResponse(prompt);
+            domElements.loreContainer.innerHTML = `<p class="font-body-alt text-xl leading-relaxed">${loreText}</p>`;
+        }
+
+        // --- Start the App ---
+        document.addEventListener('DOMContentLoaded', initializeApp);
+
     </script>
 </body>
 </html>
