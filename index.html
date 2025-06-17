@@ -135,7 +135,6 @@
     <script>
         /**
          * App State & Configuration
-         * This section holds references to DOM elements and global state variables.
          */
         const dom = {
             themeToggle: document.getElementById('theme-toggle'), homeLink: document.getElementById('homeLink'),
@@ -149,10 +148,7 @@
         };
 
         const state = {
-            allArtwork: [],
-            categories: [],
-            modalGallery: [],
-            currentModalIndex: 0,
+            allArtwork: [], categories: [], modalGallery: [], currentModalIndex: 0,
         };
 
         const config = {
@@ -161,25 +157,7 @@
         };
 
         /**
-         * Initialization Function
-         * This is the main entry point for the application.
-         */
-        async function initializeApp() {
-            dom.yearSpan.textContent = new Date().getFullYear();
-            const savedTheme = localStorage.getItem('theme') || 'light';
-            applyTheme(savedTheme);
-            
-            await fetchArtworkData();
-            if (state.allArtwork.length > 0) {
-                populateGalleries();
-                createFilterButtons();
-            }
-            setupEventListeners();
-        }
-
-        /**
          * Data Fetching & Processing
-         * Functions related to getting data from Azure and Gemini.
          */
         async function fetchArtworkData() {
             try {
@@ -247,7 +225,6 @@
 
         /**
          * UI Rendering Functions
-         * Functions that create and update HTML content.
          */
         const createGalleryItem = (artwork) => {
             const img = document.createElement('img');
@@ -368,8 +345,23 @@
             });
         }
         
-        // Start the App
-        window.onload = initializeApp;
+        /**
+         * App Initializer
+         * Waits for the browser to be ready, then starts the main application logic.
+         */
+        function startAppOnLoad() {
+            // This function checks if the required `azblob` library is loaded.
+            // It will keep checking every 100ms until it's available.
+            if (typeof azblob !== 'undefined') {
+                initializeApp();
+            } else {
+                setTimeout(startAppOnLoad, 100);
+            }
+        }
+        
+        // Start the app once the page is fully loaded.
+        window.onload = startAppOnLoad;
+
     </script>
 </body>
 </html>
