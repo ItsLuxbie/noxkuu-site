@@ -132,40 +132,67 @@
 
     <!-- JAVASCRIPT LOGIC -->
     <script>
-        function loadScript(src, callback) {
-            const script = document.createElement('script');
-            script.src = src;
-            script.onload = () => callback();
-            script.onerror = () => console.error(`Failed to load script: ${src}`);
-            document.head.appendChild(script);
-        }
-
-        function initializeApp() {
-            // --- App State & Configuration ---
+        document.addEventListener('DOMContentLoaded', () => {
+            
             const dom = {
-                themeToggle: document.getElementById('theme-toggle'), homeLink: document.getElementById('homeLink'),
-                mainContent: document.getElementById('main-content'), galleryPage: document.getElementById('gallery-page'),
-                viewFullGalleryBtn: document.getElementById('view-full-gallery-btn'), recentGallery: document.getElementById('recent-gallery-container'),
-                fullGallery: document.getElementById('full-gallery-container'), filterButtons: document.getElementById('filter-buttons'),
-                modal: document.getElementById('imageModal'), closeModalBtn: document.getElementById('closeModalBtn'),
-                modalImg: document.getElementById('modalImage'), prevBtn: document.getElementById('prevBtn'),
-                nextBtn: document.getElementById('nextBtn'), loreContainer: document.getElementById('lore-container'),
+                themeToggle: document.getElementById('theme-toggle'),
+                homeLink: document.getElementById('homeLink'),
+                mainContent: document.getElementById('main-content'),
+                galleryPage: document.getElementById('gallery-page'),
+                viewFullGalleryBtn: document.getElementById('view-full-gallery-btn'),
+                recentGallery: document.getElementById('recent-gallery-container'),
+                fullGallery: document.getElementById('full-gallery-container'),
+                filterButtons: document.getElementById('filter-buttons'),
+                modal: document.getElementById('imageModal'),
+                closeModalBtn: document.getElementById('closeModalBtn'),
+                modalImg: document.getElementById('modalImage'),
+                prevBtn: document.getElementById('prevBtn'),
+                nextBtn: document.getElementById('nextBtn'),
+                loreContainer: document.getElementById('lore-container'),
                 yearSpan: document.getElementById('year'),
             };
 
             const state = {
-                allArtwork: [], categories: [], modalGallery: [], currentModalIndex: 0,
+                allArtwork: [],
+                categories: [],
+                modalGallery: [],
+                currentModalIndex: 0,
             };
 
             const config = {
-                storageContainerUrl: "https://noxkuuimages.blob.core.windows.net/artworks",
                 geminiApiKey: "AIzaSyAgl2kPBCxQJg4PVY9kwIPpl22dT8iFRC8"
             };
+            
+            // =================================================================
+            // MANUAL ARTWORK DATA
+            // =================================================================
+            // To add new artwork:
+            // 1. Upload your image to a hosting service (like your Azure Blob Storage).
+            // 2. Copy the full, public URL of the uploaded image.
+            // 3. Add a new object to this 'artworkData' array, following the format.
+            //    - 'src': The full URL to the image.
+            //    - 'alt': A description for screen readers (e.g., "Artwork of Superman").
+            //    - 'category': Use lowercase: 'marvel', 'dc', 'star-wars', 'pokemon', 'original', etc.
+            //    - 'flavorText': A short, specific description for the AI lore prompt.
+            // 4. New artwork should be added to the TOP of the list to appear first.
+            // =================================================================
+            const artworkData = [
+                { src: 'https://noxkuuimages.blob.core.windows.net/artworks/DC-CassandraCain.jpg', alt: 'Artwork of Cassandra Cain', category: 'dc', flavorText: 'Cassandra Cain as Batgirl' },
+                { src: 'https://noxkuuimages.blob.core.windows.net/artworks/DC-Superman.jpg', alt: 'Artwork of Superman', category: 'dc', flavorText: 'Superman, the Man of Steel' },
+                { src: 'https://noxkuuimages.blob.core.windows.net/artworks/Marvel-DareDevil.jpg', alt: 'Artwork of DareDevil', category: 'marvel', flavorText: 'Matt Murdock, the Daredevil of Hell\'s Kitchen' },
+                { src: 'https://noxkuuimages.blob.core.windows.net/artworks/Marvel-JeanGrayPhoenix.jpg', alt: 'Artwork of Jean Gray Phoenix', category: 'marvel', flavorText: 'Jean Grey as the cosmic entity Dark Phoenix' },
+                { src: 'https://noxkuuimages.blob.core.windows.net/artworks/Marvel-Moonknight.jpg', alt: 'Artwork of Moonknight', category: 'marvel', flavorText: 'Marc Spector, the avatar of the Egyptian moon god Khonshu' },
+                { src: 'https://noxkuuimages.blob.core.windows.net/artworks/Marvel-Mystique.jpg', alt: 'Artwork of Mystique', category: 'marvel', flavorText: 'Mystique, the shape-shifting mutant' },
+                { src: 'https://noxkuuimages.blob.core.windows.net/artworks/OC-SkaterDuck.png', alt: 'Artwork of Skater Duck', category: 'original', flavorText: '' },
+                { src: 'https://noxkuuimages.blob.core.windows.net/artworks/Pokemon-Eevee.JPG', alt: 'Artwork of Eevee', category: 'pokemon', flavorText: 'Eevee, the Evolution Pokémon' },
+                { src: 'https://noxkuuimages.blob.core.windows.net/artworks/StarWars-Jedi.jpg', alt: 'Artwork of Jedi', category: 'star-wars', flavorText: 'A Jedi Knight from the Star Wars Old Republic era' },
+                // <-- Add new artwork objects here, above this line.
+            ];
 
             // --- UI & Page Logic ---
             const applyTheme = (theme) => {
-                const lightIcon = document.getElementById('theme-toggle-light-icon');
-                const darkIcon = document.getElementById('theme-toggle-dark-icon');
+                const lightIcon = dom.themeToggle.querySelector('#theme-toggle-light-icon');
+                const darkIcon = dom.themeToggle.querySelector('#theme-toggle-dark-icon');
                 if (theme === 'dark') {
                     document.documentElement.classList.add('dark');
                     lightIcon.style.display = 'block';
@@ -183,13 +210,13 @@
                 window.scrollTo(0, 0);
             };
 
-            const openModal = (element, nodeList, artworkData) => {
+            const openModal = (element, nodeList, artwork) => {
                 state.modalGallery = nodeList;
                 dom.modal.style.display = 'flex';
                 dom.modalImg.src = element.src;
                 state.currentModalIndex = state.modalGallery.findIndex(img => img.src === element.src);
                 document.body.style.overflow = 'hidden';
-                fetchAndDisplayLore(artworkData);
+                fetchAndDisplayLore(artwork);
             };
 
             const closeModal = () => {
@@ -233,7 +260,11 @@
                     button.textContent = cat;
                     button.className = 'filter-btn px-4 py-2 text-sm md:text-base font-semibold rounded-lg transition-colors duration-200';
                     button.dataset.filter = cat.toLowerCase().replace(/\s+/g, '-');
-                    button.classList.add(cat === 'All' ? 'bg-accent text-white' : 'bg-inactive-filter hover-bg-inactive-filter');
+                    if (cat === 'All') {
+                        button.classList.add('bg-accent', 'text-white');
+                    } else {
+                        button.classList.add('bg-inactive-filter', 'hover-bg-inactive-filter');
+                    }
                     dom.filterButtons.appendChild(button);
                 });
             };
@@ -244,46 +275,12 @@
                 });
             };
 
-            async function fetchArtworkData() {
-                if (typeof azblob === 'undefined') {
-                    console.error("Azure SDK (azblob) is not loaded yet. This should not happen if called correctly.");
-                    return;
-                }
-                try {
-                    const containerClient = new azblob.ContainerClient(config.storageContainerUrl);
-                    const artworkList = [];
-                    for await (const blob of containerClient.listBlobsFlat()) {
-                        const { name: filename } = blob;
-                        const parts = filename.split('.')[0].split('-');
-                        if (parts.length >= 2) {
-                            const category = parts[0].toLowerCase().replace(/\s+/g, '-');
-                            const imageName = parts.slice(1).join(' ');
-                            artworkList.push({
-                                src: `${config.storageContainerUrl}/${filename}`,
-                                alt: `Artwork of ${imageName}`, category,
-                                flavorText: `${imageName} from ${parts[0]}`
-                            });
-                        }
-                    }
-                    state.allArtwork = artworkList.reverse();
-                    const uniqueCategories = ['All', ...new Set(state.allArtwork.map(art => {
-                        const cat = art.category.toLowerCase();
-                        return cat === 'dc' ? 'DC' : cat.charAt(0).toUpperCase() + cat.slice(1).replace(/-/g, ' ');
-                    }))];
-                    state.categories = uniqueCategories;
-                } catch (error) {
-                    console.error("Error fetching artwork from Azure Blob Storage:", error);
-                    dom.recentGallery.innerHTML = "<p class='text-red-500 text-center'>Could not load artwork. Please ensure the storage account is configured for public access and CORS is set up.</p>";
-                }
-            }
-
             async function getGeminiTextResponse(prompt) {
                 if (!config.geminiApiKey || config.geminiApiKey === "PASTE_YOUR_GEMINI_API_KEY_HERE") {
                     return "API Key is missing. Please add it to the script.";
                 }
                 const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${config.geminiApiKey}`;
                 const payload = { contents: [{ parts: [{ text: prompt }] }] };
-
                 try {
                     const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
                     if (!response.ok) throw new Error(`API call failed with status: ${response.status}`);
@@ -347,19 +344,28 @@
             }
 
             // --- Initializer ---
-            async function main() {
+            function main() {
                 dom.yearSpan.textContent = new Date().getFullYear();
                 applyTheme(localStorage.getItem('theme') || 'light');
-                await fetchArtworkData();
+                
+                state.allArtwork = artworkData; 
+                state.allArtwork.reverse(); // Newest first
+                const uniqueCategories = ['All', ...new Set(state.allArtwork.map(art => {
+                    const cat = art.category.toLowerCase();
+                    if (cat === 'dc') return 'DC';
+                    return cat.charAt(0).toUpperCase() + cat.slice(1).replace(/-/g, ' ');
+                }))];
+                state.categories = uniqueCategories;
+                
                 if (state.allArtwork.length > 0) {
                     populateGalleries();
                     createFilterButtons();
                 }
                 setupEventListeners();
             }
-
+            
             main();
-        }
+        });
     </script>
 </body>
 </html>
