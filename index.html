@@ -232,7 +232,8 @@
 
         // --- GEMINI API FUNCTION ---
         async function getGeminiTextResponse(prompt) {
-            const apiKey = ""; // Leave blank
+            // IMPORTANT: Add your Gemini API key here.
+            const apiKey = "AIzaSyAgl2kPBCxQJg4PVY9kwIPpl22dT8iFRC8";
             const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
             const payload = { contents: [{ parts: [{ text: prompt }] }] };
 
