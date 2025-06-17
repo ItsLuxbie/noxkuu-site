@@ -13,9 +13,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Permanent+Marker&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
-    <!-- Azure Blob Storage SDK -->
-    <script src="https://cdn.jsdelivr.net/npm/@azure/storage-blob@12.11.0/dist/storage-blob.min.js"></script>
-
     <script>
         tailwind.config = { darkMode: 'class' };
     </script>
@@ -372,7 +369,7 @@
         }
         
         // Start the App
-        document.addEventListener('DOMContentLoaded', initializeApp);
+        window.onload = initializeApp;
     </script>
 </body>
 </html>
