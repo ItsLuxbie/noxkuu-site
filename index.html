@@ -43,20 +43,6 @@
         .hover-bg-accent:hover { background-color: var(--accent-hover-color); }
         .bg-inactive-filter { background-color: var(--inactive-filter-bg); }
         .hover-bg-inactive-filter:hover { background-color: var(--inactive-filter-hover-bg); }
-        
-        .gallery-container {
-            column-gap: 1.5rem;
-            columns: 2;
-        }
-        @media (min-width: 768px) {
-            .gallery-container {
-                columns: 3;
-            }
-        }
-        .gallery-item {
-            break-inside: avoid;
-            margin-bottom: 1.5rem;
-        }
         .modal-bg { background-color: rgba(253, 248, 246, 0.9); }
         .dark .modal-bg { background-color: rgba(28, 25, 23, 0.9); }
     </style>
@@ -92,7 +78,7 @@
             <section id="recent-work" class="py-20 md:py-32 bg-white dark:bg-[#111111]">
                 <div class="container mx-auto px-6">
                     <h2 class="font-heading text-4xl md:text-5xl font-bold text-center mb-12 text-stone-800 dark:text-white">Recent <span class="text-accent">Work</span></h2>
-                    <div id="recent-gallery-container" class="gallery-container">
+                    <div id="recent-gallery-container" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
                         <!-- Recent gallery items will be dynamically inserted here -->
                     </div>
                     <div class="text-center mt-16">
@@ -110,7 +96,7 @@
                 <h2 class="font-heading text-4xl md:text-5xl font-bold text-center mb-4 text-stone-800 dark:text-white">Full <span class="text-accent">Gallery</span></h2>
                 <p class="text-center text-stone-500 dark:text-stone-400 mb-12">Filter by universe</p>
                 <div id="filter-buttons" class="flex flex-wrap justify-center gap-2 md:gap-4 mb-12"></div>
-                <div id="full-gallery-container" class="gallery-container"></div>
+                <div id="full-gallery-container" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6"></div>
             </div>
         </section>
     </div>
@@ -173,16 +159,16 @@
             };
             
             const artworkData = [
-                 { src: 'https://noxkuuimages.blob.core.windows.net/artworks/OC-SmokerChick.PNG', alt: 'Artwork of Girl smoking', category: 'original', flavorText: '' },
-                { src: 'https://noxkuuimages.blob.core.windows.net/artworks/DC-CassandraCain.jpg', alt: 'Artwork of Cassandra Cain', category: 'dc', flavorText: 'Cassandra Cain as Batgirl' },
-                { src: 'https://noxkuuimages.blob.core.windows.net/artworks/DC-Superman.jpg', alt: 'Artwork of Superman', category: 'dc', flavorText: 'Superman, the Man of Steel' },
+                { src: 'https://noxkuuimages.blob.core.windows.net/artworks/StarWars-Jedi.jpg', alt: 'Artwork of Jedi', category: 'star-wars', flavorText: 'A Jedi Knight from the Star Wars Old Republic era' },
                 { src: 'https://noxkuuimages.blob.core.windows.net/artworks/Marvel-DareDevil.jpg', alt: 'Artwork of DareDevil', category: 'marvel', flavorText: 'Matt Murdock, the Daredevil of Hell\'s Kitchen' },
+                { src: 'https://noxkuuimages.blob.core.windows.net/artworks/DC-Superman.jpg', alt: 'Artwork of Superman', category: 'dc', flavorText: 'Superman, the Man of Steel' },
+                { src: 'https://noxkuuimages.blob.core.windows.net/artworks/DC-CassandraCain.jpg', alt: 'Artwork of Cassandra Cain', category: 'dc', flavorText: 'Cassandra Cain as Batgirl' },
+                { src: 'https://noxkuuimages.blob.core.windows.net/artworks/Marvel-Mystique.jpg', alt: 'Artwork of Mystique', category: 'marvel', flavorText: 'Mystique, the shape-shifting mutant' },
                 { src: 'https://noxkuuimages.blob.core.windows.net/artworks/Marvel-JeanGrayPhoenix.jpg', alt: 'Artwork of Jean Gray Phoenix', category: 'marvel', flavorText: 'Jean Grey as the cosmic entity Dark Phoenix' },
                 { src: 'https://noxkuuimages.blob.core.windows.net/artworks/Marvel-Moonknight.jpg', alt: 'Artwork of Moonknight', category: 'marvel', flavorText: 'Marc Spector, the avatar of the Egyptian moon god Khonshu' },
-                { src: 'https://noxkuuimages.blob.core.windows.net/artworks/Marvel-Mystique.jpg', alt: 'Artwork of Mystique', category: 'marvel', flavorText: 'Mystique, the shape-shifting mutant' },
                 { src: 'https://noxkuuimages.blob.core.windows.net/artworks/OC-SkaterDuck.png', alt: 'Artwork of Skater Duck', category: 'original', flavorText: '' },
                 { src: 'https://noxkuuimages.blob.core.windows.net/artworks/Pokemon-Eevee.JPG', alt: 'Artwork of Eevee', category: 'pokemon', flavorText: 'Eevee, the Evolution Pokémon' },
-                { src: 'https://noxkuuimages.blob.core.windows.net/artworks/StarWars-Jedi.jpg', alt: 'Artwork of Jedi', category: 'star-wars', flavorText: 'A Jedi Knight from the Star Wars Old Republic era' },
+                { src: 'https://noxkuuimages.blob.core.windows.net/artworks/OC-SmokerChick.PNG', alt: 'Artwork of Girl smoking', category: 'original', flavorText: '' },
             ];
 
             const applyTheme = (theme) => {
@@ -229,7 +215,7 @@
 
             const populateGalleries = () => {
                 dom.recentGallery.innerHTML = '';
-                state.allArtwork.slice(0, 7).forEach(art => dom.recentGallery.appendChild(createGalleryItem(art)));
+                state.allArtwork.slice(0, 6).forEach(art => dom.recentGallery.appendChild(createGalleryItem(art)));
                 dom.fullGallery.innerHTML = '';
                 state.allArtwork.forEach(art => dom.fullGallery.appendChild(createGalleryItem(art)));
             };
@@ -239,11 +225,14 @@
                 img.src = artwork.src;
                 img.alt = artwork.alt;
                 img.className = 'rounded-lg border border-themed hover:border-violet-300 dark:hover:border-violet-500 transition-all duration-300 cursor-pointer w-full';
-                img.onclick = () => openModal(img, Array.from(dom.fullGallery.querySelectorAll('.gallery-item:not([style*="display: none"]) img')), artwork);
                 const itemDiv = document.createElement('div');
-                itemDiv.className = 'gallery-item';
+                itemDiv.className = 'gallery-item mb-6';
                 itemDiv.dataset.category = artwork.category;
                 itemDiv.appendChild(img);
+                img.onclick = () => {
+                    const currentVisibleItems = Array.from(dom.fullGallery.querySelectorAll('.gallery-item:not(.hidden) img'));
+                    openModal(img, currentVisibleItems, artwork);
+                };
                 return itemDiv;
             };
 
