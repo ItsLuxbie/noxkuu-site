@@ -5,6 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NoxKuu | Digital Art</title>
     
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="https://noxkuuimages.blob.core.windows.net/artworks/FaviChick.png">
+    <link rel="shortcut icon" href="https://noxkuuimages.blob.core.windows.net/artworks/FaviChick.png" type="image/x-icon">
+    <link rel="apple-touch-icon" href="https://noxkuuimages.blob.core.windows.net/artworks/FaviChick.png">
+    
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
@@ -51,7 +56,11 @@
     <!-- HEADER -->
     <header class="fixed top-0 left-0 right-0 z-50 bg-header backdrop-blur-md border-b border-themed">
         <div class="container mx-auto px-6 py-4 flex justify-between items-center">
-            <a href="#" id="homeLink" class="text-2xl font-bold tracking-wider text-stone-800 dark:text-white font-heading">NOXKUU</a>
+            <a href="#" id="homeLink" class="flex items-center gap-3">
+                <!-- LOGO IMAGE: For best quality, replace this with a high-resolution version -->
+                <img src="https://noxkuuimages.blob.core.windows.net/artworks/FaviChick.png" alt="NoxKuu Logo" class="h-8 w-8">
+                <span class="text-2xl font-bold tracking-wider text-stone-800 dark:text-white font-heading">NOXKUU</span>
+            </a>
             <div class="flex items-center gap-4">
                 <button id="theme-toggle" class="p-2 rounded-full text-stone-500 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800 focus:outline-none">
                     <svg id="theme-toggle-light-icon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
@@ -152,26 +161,16 @@
             };
 
             const state = {
-                allArtwork: [], categories: [], modalGallery: [], currentModalIndex: 0,
+                allArtwork: [],
+                categories: [],
+                modalGallery: [],
+                currentModalIndex: 0,
             };
 
             const config = {
                 geminiApiKey: "AIzaSyAgl2kPBCxQJg4PVY9kwIPpl22dT8iFRC8"
             };
-
-            // =================================================================
-            // MANUAL ARTWORK DATA
-            // =================================================================
-            // To add new artwork:
-            // 1. Upload your image to a hosting service (like your Azure Blob Storage).
-            // 2. Copy the full, public URL of the uploaded image.
-            // 3. Add a new object to this 'artworkData' array, following the format.
-            //    - 'src': The full URL to the image.
-            //    - 'alt': A description for screen readers (e.g., "Artwork of Superman").
-            //    - 'category': Use lowercase: 'marvel', 'dc', 'star-wars', 'pokemon', 'original', etc.
-            //    - 'flavorText': A short, specific description for the AI lore prompt.
-            // 4. New artwork should be added to the TOP of the list to appear first.
-            // =================================================================
+            
             const artworkData = [
                 { src: 'https://noxkuuimages.blob.core.windows.net/artworks/DC-CassandraCain.jpg', alt: 'Artwork of Cassandra Cain', category: 'dc', flavorText: 'Cassandra Cain as Batgirl' },
                 { src: 'https://noxkuuimages.blob.core.windows.net/artworks/DC-Superman.jpg', alt: 'Artwork of Superman', category: 'dc', flavorText: 'Superman, the Man of Steel' },
@@ -182,7 +181,7 @@
                 { src: 'https://noxkuuimages.blob.core.windows.net/artworks/OC-SkaterDuck.png', alt: 'Artwork of Skater Duck', category: 'original', flavorText: '' },
                 { src: 'https://noxkuuimages.blob.core.windows.net/artworks/Pokemon-Eevee.JPG', alt: 'Artwork of Eevee', category: 'pokemon', flavorText: 'Eevee, the Evolution Pokémon' },
                 { src: 'https://noxkuuimages.blob.core.windows.net/artworks/StarWars-Jedi.jpg', alt: 'Artwork of Jedi', category: 'star-wars', flavorText: 'A Jedi Knight from the Star Wars Old Republic era' },
-                // <-- Add new artwork objects here, above this line.
+                { src: 'https://noxkuuimages.blob.core.windows.net/artworks/OC-SmokerChick.PNG', alt: 'Artwork of Girl smoking', category: 'original', flavorText: '' },
             ];
 
             const applyTheme = (theme) => {
