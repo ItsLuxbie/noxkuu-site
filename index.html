@@ -28,12 +28,14 @@
             --bg-color: #fdf8f6; --text-color: #57534e; --header-bg: rgba(253, 248, 246, 0.8);
             --border-color: #e7e5e4; --accent-color: #a78bfa; --accent-hover-color: #8b5cf6;
             --inactive-filter-bg: #ffffff; --inactive-filter-hover-bg: #f5f5f4;
+            --filter-box-bg: #f5f3ff; /* Lighter pastel purple for filter box */
             @apply transition-colors duration-300;
         }
         .dark body {
             --bg-color: #1c1917; --text-color: #d6d3d1; --header-bg: rgba(28, 25, 23, 0.8);
             --border-color: #44403c; --accent-hover-color: #c4b5fd; --inactive-filter-bg: #292524;
             --inactive-filter-hover-bg: #44403c;
+            --filter-box-bg: #292524; /* Dark mode equivalent for filter box */
         }
         .font-heading { font-family: 'Permanent Marker', cursive; }
         .font-body-alt { font-family: 'Caveat', cursive; }
@@ -45,6 +47,24 @@
         .hover-bg-inactive-filter:hover { background-color: var(--inactive-filter-hover-bg); }
         .modal-bg { background-color: rgba(253, 248, 246, 0.9); }
         .dark .modal-bg { background-color: rgba(28, 25, 23, 0.9); }
+        .bg-filter-box { background-color: var(--filter-box-bg); }
+
+        /* Custom styles for the dropdown select elements */
+        .custom-select {
+           -webkit-appearance: none;
+           -moz-appearance: none;
+           appearance: none;
+           /* Custom arrow for light mode */
+           background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%2357534e' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+           background-position: right 0.75rem center;
+           background-repeat: no-repeat;
+           background-size: 1.25em 1.25em;
+           padding-right: 2.75rem; /* Make space for the arrow */
+        }
+       .dark .custom-select {
+            /* Custom arrow for dark mode */
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23d6d3d1' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+       }
     </style>
 </head>
 <body class="overflow-x-hidden">
@@ -95,7 +115,7 @@
             <div class="container mx-auto px-6">
                 <h2 class="font-heading text-4xl md:text-5xl font-bold text-center mb-4 text-stone-800 dark:text-white">Full <span class="text-accent">Gallery</span></h2>
                 <p class="text-center text-stone-500 dark:text-stone-400 mb-12">Filter by universe</p>
-                <div id="filter-buttons" class="flex flex-wrap justify-center gap-2 md:gap-4 mb-12"></div>
+                <div id="filter-container" class="flex flex-wrap justify-center gap-4 mb-12"></div>
                 <div id="full-gallery-container" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6"></div>
             </div>
         </section>
@@ -143,7 +163,7 @@
                 themeToggle: document.getElementById('theme-toggle'), homeLink: document.getElementById('homeLink'),
                 mainContent: document.getElementById('main-content'), galleryPage: document.getElementById('gallery-page'),
                 viewFullGalleryBtn: document.getElementById('view-full-gallery-btn'), recentGallery: document.getElementById('recent-gallery-container'),
-                fullGallery: document.getElementById('full-gallery-container'), filterButtons: document.getElementById('filter-buttons'),
+                fullGallery: document.getElementById('full-gallery-container'), filterContainer: document.getElementById('filter-container'),
                 modal: document.getElementById('imageModal'), closeModalBtn: document.getElementById('closeModalBtn'),
                 modalImg: document.getElementById('modalImage'), prevBtn: document.getElementById('prevBtn'),
                 nextBtn: document.getElementById('nextBtn'), loreContainer: document.getElementById('lore-container'),
@@ -151,27 +171,27 @@
             };
 
             const state = {
-                allArtwork: [], categories: [], modalGallery: [], currentModalIndex: 0,
+                allArtwork: [], modalGallery: [], currentModalIndex: 0, categoryTree: {},
             };
 
             const config = {
-                geminiApiKey: "AIzaSyAgl2kPBCxQJg4PVY9kwIPpl22dT8iFRC8"
+                geminiApiKey: "AIzaSyAgl2kPBCxQJg4PVY9kwIPpl22dT8iFRC8" // IMPORTANT: Replace with your actual Gemini API Key
             };
             
             const artworkData = [
-                { src: 'https://noxkuuimages.blob.core.windows.net/artworks/StarWars-Jedi.jpg', alt: 'Artwork of Jedi', category: 'star-wars', flavorText: 'A Jedi Knight from the Star Wars Old Republic era' },
-                { src: 'https://noxkuuimages.blob.core.windows.net/artworks/Marvel-Daredevil.png', alt: 'Artwork of DareDevil', category: 'marvel', flavorText: 'Matt Murdock, the Daredevil of Hell\'s Kitchen' },
-                { src: 'https://noxkuuimages.blob.core.windows.net/artworks/DC-Superman.png', alt: 'Artwork of Superman', category: 'dc', flavorText: 'Superman, the Man of Steel' },
-                { src: 'https://noxkuuimages.blob.core.windows.net/artworks/DC-CassandraCain.png', alt: 'Artwork of Cassandra Cain', category: 'dc', flavorText: 'Cassandra Cain as Batgirl' },
-                { src: 'https://noxkuuimages.blob.core.windows.net/artworks/Marvel-Mystique.png', alt: 'Artwork of Mystique', category: 'marvel', flavorText: 'Mystique, the shape-shifting mutant' },
-                { src: 'https://noxkuuimages.blob.core.windows.net/artworks/Marvel-JeanGrayPhoenix.png', alt: 'Artwork of Jean Gray Phoenix', category: 'marvel', flavorText: 'Jean Grey as the cosmic entity Dark Phoenix' },
-                { src: 'https://noxkuuimages.blob.core.windows.net/artworks/Marvel-MoonKnight.png', alt: 'Artwork of Moonknight', category: 'marvel', flavorText: 'Marc Spector, the avatar of the Egyptian moon god Khonshu' },
-                { src: 'https://noxkuuimages.blob.core.windows.net/artworks/OC-SkaterDuck.png', alt: 'Artwork of Skater Duck', category: 'original', flavorText: '' },
-                { src: 'https://noxkuuimages.blob.core.windows.net/artworks/Pokemon-Eevee.JPG', alt: 'Artwork of Eevee', category: 'pokemon', flavorText: 'Eevee, Dex number 133 entry gen 1' },
-                { src: 'https://noxkuuimages.blob.core.windows.net/artworks/OC-SmokerChick.PNG', alt: 'Artwork of Girl smoking', category: 'original', flavorText: '' },
-                { src: 'https://noxkuuimages.blob.core.windows.net/artworks/FairyTail-Nastu.png', alt: 'Artwork of Nastu Dragneel', category: 'fairy-tail', flavorText: 'Natsu Dragneel, the Fire Dragon Slayer from the Fairy Tail guild' },
-                { src: 'https://noxkuuimages.blob.core.windows.net/artworks/PowerRangrs-ThomasOliver.png', alt: 'Artwork of Tommy Oliver', category: 'power-rangers', flavorText: 'The legendary Power Ranger, Tommy Oliver, as the mighty Green Ranger.' },
-                { src: 'https://noxkuuimages.blob.core.windows.net/artworks/JuJutsuKaisen-Gojo.png', alt: 'Artwork of Satoru Gojo', category: 'jujutsu-kaisen', flavorText: 'The strongest Jujutsu Sorcerer of the modern era, Satoru Gojo.' },
+                { src: 'https://noxkuuimages.blob.core.windows.net/artworks/StarWars-Jedi.jpg', alt: 'Artwork of Jedi', primary: ['tv & film', 'comics'], secondary: ['star-wars'], flavorText: 'A Jedi Knight from the Star Wars Old Republic era' },
+                { src: 'https://noxkuuimages.blob.core.windows.net/artworks/Marvel-Daredevil.png', alt: 'Artwork of DareDevil', primary: ['comics', 'tv & film'], secondary: ['marvel'], flavorText: 'Matt Murdock, the Daredevil of Hell\'s Kitchen' },
+                { src: 'https://noxkuuimages.blob.core.windows.net/artworks/DC-Superman.png', alt: 'Artwork of Superman', primary: ['comics', 'tv & film'], secondary: ['dc', 'justice league'], flavorText: 'Superman, the Man of Steel' },
+                { src: 'https://noxkuuimages.blob.core.windows.net/artworks/DC-CassandraCain.png', alt: 'Artwork of Cassandra Cain', primary: ['comics'], secondary: ['dc', 'batman'], flavorText: 'Cassandra Cain as Batgirl' },
+                { src: 'https://noxkuuimages.blob.core.windows.net/artworks/Marvel-Mystique.png', alt: 'Artwork of Mystique', primary: ['comics', 'tv & film'], secondary: ['marvel', 'X-Men'], flavorText: 'Mystique, the shape-shifting mutant' },
+                { src: 'https://noxkuuimages.blob.core.windows.net/artworks/Marvel-JeanGrayPhoenix.png', alt: 'Artwork of Jean Gray Phoenix', primary: ['comics', 'tv & film'], secondary: ['marvel', 'X-MEN'], flavorText: 'Jean Grey as the cosmic entity Dark Phoenix' },
+                { src: 'https://noxkuuimages.blob.core.windows.net/artworks/Marvel-MoonKnight.png', alt: 'Artwork of Moonknight', primary: ['comics', 'tv & film'], secondary: ['marvel'], flavorText: 'Marc Spector, the avatar of the Egyptian moon god Khonshu' },
+                { src: 'https://noxkuuimages.blob.core.windows.net/artworks/OC-SkaterDuck.png', alt: 'Artwork of Skater Duck', primary: ['original'], secondary: [], flavorText: '' },
+                { src: 'https://noxkuuimages.blob.core.windows.net/artworks/Pokemon-Eevee.JPG', alt: 'Artwork of Eevee', primary: ['games', 'anime & manga'], secondary: ['pokemon'], flavorText: 'Eevee, Dex number 133 entry gen 1' },
+                { src: 'https://noxkuuimages.blob.core.windows.net/artworks/OC-SmokerChick.PNG', alt: 'Artwork of Girl smoking', primary: ['original'], secondary: [], flavorText: '' },
+                { src: 'https://noxkuuimages.blob.core.windows.net/artworks/FairyTail-Nastu.png', alt: 'Artwork of Nastu Dragneel', primary: ['anime & manga'], secondary: ['fairy-tail'], flavorText: 'Natsu Dragneel, the Fire Dragon Slayer from the Fairy Tail guild' },
+                { src: 'https://noxkuuimages.blob.core.windows.net/artworks/PowerRangrs-ThomasOliver.png', alt: 'Artwork of Tommy Oliver', primary: ['tv & film', 'comics'], secondary: ['power-rangers'], flavorText: 'The legendary Power Ranger, Tommy Oliver, as the mighty Green Ranger.' },
+                { src: 'https://noxkuuimages.blob.core.windows.net/artworks/JuJutsuKaisen-Gojo.png', alt: 'Artwork of Satoru Gojo', primary: ['anime & manga'], secondary: ['jujutsu-kaisen'], flavorText: 'The strongest Jujutsu Sorcerer of the modern era, Satoru Gojo.' },
             ];
 
             const applyTheme = (theme) => {
@@ -229,35 +249,123 @@
                 img.alt = artwork.alt;
                 img.className = 'rounded-lg border border-themed hover:border-violet-300 dark:hover:border-violet-500 transition-all duration-300 cursor-pointer w-full';
                 const itemDiv = document.createElement('div');
-                itemDiv.className = 'gallery-item mb-6';
-                itemDiv.dataset.category = artwork.category;
+                itemDiv.className = 'gallery-item';
                 itemDiv.appendChild(img);
                 img.onclick = () => {
-                    const currentVisibleItems = Array.from(dom.fullGallery.querySelectorAll('.gallery-item:not(.hidden) img'));
+                    const currentVisibleItems = Array.from(dom.fullGallery.querySelectorAll('.gallery-item:not([style*="display: none"]) img'));
                     openModal(img, currentVisibleItems, artwork);
                 };
                 return itemDiv;
             };
 
-            const createFilterButtons = () => {
-                dom.filterButtons.innerHTML = '';
-                state.categories.forEach(cat => {
-                    const button = document.createElement('button');
-                    button.textContent = cat;
-                    button.className = 'filter-btn px-4 py-2 text-sm md:text-base font-semibold rounded-lg transition-colors duration-200';
-                    button.dataset.filter = cat.toLowerCase().replace(/\s+/g, '-');
-                    if (cat === 'All') {
-                        button.classList.add('bg-accent', 'text-white');
-                    } else {
-                        button.classList.add('bg-inactive-filter', 'hover-bg-inactive-filter');
-                    }
-                    dom.filterButtons.appendChild(button);
-                });
+            const formatCategoryName = (slug) => {
+                return slug.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
             };
 
-            const filterGallery = (filter) => {
+            const createFilterUI = () => {
+                dom.filterContainer.innerHTML = '';
+                
+                const wrapper = document.createElement('div');
+                wrapper.className = 'flex items-center justify-center flex-col sm:flex-row gap-4 p-4 rounded-xl bg-filter-box border border-violet-200 dark:border-stone-700 w-full max-w-lg mx-auto';
+
+                const selectClasses = 'w-full sm:w-auto flex-grow p-3 rounded-lg border-2 border-violet-300 dark:border-stone-600 bg-white dark:bg-stone-700 text-stone-900 dark:text-stone-200 focus:border-accent dark:focus:border-accent focus:outline-none cursor-pointer transition-all duration-300 custom-select font-heading font-bold tracking-wider';
+
+                const mainSelect = document.createElement('select');
+                mainSelect.id = 'main-category-select';
+                mainSelect.className = selectClasses;
+
+                const subSelect = document.createElement('select');
+                subSelect.id = 'sub-category-select';
+                subSelect.className = selectClasses;
+                subSelect.classList.add('opacity-0', 'scale-95', 'pointer-events-none');
+                subSelect.style.display = 'none';
+
+                // Dynamically build category tree from artwork data
+                const categoryTree = { 'All': {} };
+                state.allArtwork.forEach(art => {
+                    art.primary.forEach(pCat => {
+                        if (!categoryTree[pCat]) {
+                            categoryTree[pCat] = new Set();
+                        }
+                        art.secondary.forEach(sCat => {
+                            categoryTree[pCat].add(sCat);
+                        });
+                    });
+                });
+                state.categoryTree = categoryTree;
+
+                Object.keys(state.categoryTree).sort().forEach(cat => {
+                    const option = document.createElement('option');
+                    option.value = cat;
+                    option.textContent = formatCategoryName(cat);
+                    mainSelect.appendChild(option);
+                });
+                
+                wrapper.appendChild(mainSelect);
+                wrapper.appendChild(subSelect);
+                dom.filterContainer.appendChild(wrapper);
+
+                mainSelect.addEventListener('change', handleFilterChange);
+                subSelect.addEventListener('change', handleFilterChange);
+            };
+
+            const handleFilterChange = (e) => {
+                const mainSelect = document.getElementById('main-category-select');
+                const subSelect = document.getElementById('sub-category-select');
+                const mainCat = mainSelect.value;
+                const subCats = state.categoryTree[mainCat];
+
+                if (e && e.target.id === 'main-category-select') {
+                    if (subCats && subCats.size > 0) {
+                        subSelect.innerHTML = '';
+                        
+                        const allOption = document.createElement('option');
+                        allOption.value = mainCat;
+                        allOption.textContent = `All ${formatCategoryName(mainCat)}`;
+                        subSelect.appendChild(allOption);
+
+                        subCats.forEach(subCatName => {
+                            const option = document.createElement('option');
+                            option.value = subCatName;
+                            option.textContent = formatCategoryName(subCatName);
+                            subSelect.appendChild(option);
+                        });
+                        
+                        subSelect.style.display = 'inline-block';
+                        setTimeout(() => {
+                            subSelect.classList.remove('opacity-0', 'scale-95', 'pointer-events-none');
+                        }, 10);
+                    } else {
+                         subSelect.classList.add('opacity-0', 'scale-95', 'pointer-events-none');
+                         setTimeout(() => {
+                            subSelect.style.display = 'none';
+                            subSelect.innerHTML = '';
+                         }, 300);
+                    }
+                }
+
+                let filterTag;
+                if (mainCat === 'All') {
+                    filterTag = 'all';
+                } else if (subSelect.style.display !== 'none' && subSelect.value) {
+                    filterTag = subSelect.value;
+                } else {
+                    filterTag = mainCat;
+                }
+                filterGallery(filterTag);
+            };
+
+            const filterGallery = (tag) => {
                 dom.fullGallery.querySelectorAll('.gallery-item').forEach(item => {
-                    item.style.display = (filter === 'all' || item.dataset.category === filter) ? 'block' : 'none';
+                    const imgSrc = item.querySelector('img').src;
+                    const artwork = state.allArtwork.find(art => art.src === imgSrc);
+                    const itemTags = artwork ? [...artwork.primary, ...artwork.secondary] : [];
+                    
+                    if (tag === 'all' || itemTags.includes(tag)) {
+                        item.style.display = 'block';
+                    } else {
+                        item.style.display = 'none';
+                    }
                 });
             };
 
@@ -283,7 +391,7 @@
             }
             
             async function fetchAndDisplayLore(artwork) {
-                if (artwork.category === 'original') {
+                if (artwork.primary.includes('original')) {
                     dom.loreContainer.innerHTML = '<p class="font-body-alt text-xl">A unique creation by NoxKuu.</p>';
                     return;
                 }
@@ -301,18 +409,6 @@
                     const newTheme = document.documentElement.classList.contains('dark') ? 'light' : 'dark';
                     localStorage.setItem('theme', newTheme);
                     applyTheme(newTheme);
-                });
-
-                dom.filterButtons.addEventListener('click', (e) => {
-                    if (e.target.classList.contains('filter-btn')) {
-                        dom.filterButtons.querySelectorAll('.filter-btn').forEach(btn => {
-                            btn.classList.remove('bg-accent', 'text-white');
-                            btn.classList.add('bg-inactive-filter', 'hover-bg-inactive-filter');
-                        });
-                        e.target.classList.add('bg-accent', 'text-white');
-                        e.target.classList.remove('bg-inactive-filter', 'hover-bg-inactive-filter');
-                        filterGallery(e.target.dataset.filter);
-                    }
                 });
                 
                 dom.closeModalBtn.addEventListener('click', closeModal);
@@ -335,18 +431,13 @@
                 
                 state.allArtwork = artworkData; 
                 state.allArtwork.reverse();
-                const uniqueCategories = ['All', ...new Set(state.allArtwork.map(art => {
-                    const cat = art.category.toLowerCase();
-                    if (cat === 'dc') return 'DC';
-                    return cat.charAt(0).toUpperCase() + cat.slice(1).replace(/-/g, ' ');
-                }))];
-                state.categories = uniqueCategories;
                 
                 if (state.allArtwork.length > 0) {
                     populateGalleries();
-                    createFilterButtons();
+                    createFilterUI();
                 }
                 setupEventListeners();
+                handleFilterChange(null);
             }
             
             main();
