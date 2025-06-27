@@ -122,16 +122,18 @@
     </div>
     
     <!-- FOOTER -->
-    <footer id="contact" class="bg-stone-800 dark:bg-black py-12">
-        <div class="container mx-auto px-6 text-center text-stone-400">
-            <p class="font-heading text-3xl font-bold tracking-wider text-white mb-4">NOXKUU</p>
-            <div class="flex justify-center mb-8">
+    <footer id="contact" class="bg-stone-800 dark:bg-black py-8">
+        <div class="container mx-auto px-6 flex justify-between items-center text-stone-400">
+            <div>
                 <a href="https://instagram.com/noxkuuart" target="_blank" class="flex items-center space-x-2 text-stone-300 hover:text-white transition-colors duration-300">
-                    <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M12.315 2c-4.013 0-4.484.018-6.058.087C4.603 2.158 3.597 2.478 2.78 3.294S1.157 4.6 1.087 6.26c-.07 1.574-.087 2.045-.087 6.058s.018 4.484.087 6.058C1.157 20.097 1.478 21.102 2.294 21.92s1.492 1.134 3.155 1.204C6.83 23.182 7.302 23.2 11.315 23.2s4.484-.018 6.058-.087c1.662-.07 2.668-.39 3.484-1.204s1.134-1.492 1.204-3.155c.07-1.574.087-2.045.087-6.058s-.018-4.484-.087-6.058C23.242 4.603 22.922 3.597 22.106 2.78S21.097 1.478 19.434 1.408C17.86 1.34 17.39 1.322 13.315 1.322H12.315zM12 7.045c-2.73 0-4.955 2.225-4.955 4.955S9.27 16.955 12 16.955s4.955-2.225 4.955-4.955S14.73 7.045 12 7.045zm0 8.084c-1.728 0-3.129-1.4-3.129-3.129s1.4-3.129 3.129-3.129 3.129 1.4 3.129 3.129-1.4 3.129-3.129 3.129zM18.883 6.13a1.47 1.47 0 100-2.94 1.47 1.47 0 000 2.94z" clip-rule="evenodd" /></svg>
+                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M12.315 2c-4.013 0-4.484.018-6.058.087C4.603 2.158 3.597 2.478 2.78 3.294S1.157 4.6 1.087 6.26c-.07 1.574-.087 2.045-.087 6.058s.018 4.484.087 6.058C1.157 20.097 1.478 21.102 2.294 21.92s1.492 1.134 3.155 1.204C6.83 23.182 7.302 23.2 11.315 23.2s4.484-.018 6.058-.087c1.662-.07 2.668-.39 3.484-1.204s1.134-1.492 1.204-3.155c.07-1.574.087-2.045.087-6.058s-.018-4.484-.087-6.058C23.242 4.603 22.922 3.597 22.106 2.78S21.097 1.478 19.434 1.408C17.86 1.34 17.39 1.322 13.315 1.322H12.315zM12 7.045c-2.73 0-4.955 2.225-4.955 4.955S9.27 16.955 12 16.955s4.955-2.225 4.955-4.955S14.73 7.045 12 7.045zm0 8.084c-1.728 0-3.129-1.4-3.129-3.129s1.4-3.129 3.129-3.129 3.129 1.4 3.129 3.129-1.4 3.129-3.129 3.129zM18.883 6.13a1.47 1.47 0 100-2.94 1.47 1.47 0 000 2.94z" clip-rule="evenodd" /></svg>
                     <span>@noxkuuart</span>
                 </a>
+                <p class="text-stone-500 text-xs mt-2">&copy; <span id="year"></span> Noxkuu.com</p>
             </div>
-            <p class="text-stone-500 text-sm">&copy; <span id="year"></span> Noxkuu.com. All rights reserved.</p>
+            <div>
+                <img src="https://noxkuuimages.blob.core.windows.net/artworks/Signature.png" alt="NoxKuu Signature" class="h-20">
+            </div>
         </div>
     </footer>
 
@@ -175,7 +177,7 @@
             };
 
             const config = {
-                geminiApiKey: "AIzaSyAgl2kPBCxQJg4PVY9kwIPpl22dT8iFRC8" // IMPORTANT: Replace with your actual Gemini API Key
+                geminiApiKey: "AIzaSyAgl2kPBCxQJg4PVY9kwIPpl22dT8iFRC8"
             };
             
             const artworkData = [
@@ -253,7 +255,7 @@
                 itemDiv.className = 'gallery-item';
                 itemDiv.appendChild(img);
                 img.onclick = () => {
-                    const currentVisibleItems = Array.from(dom.fullGallery.querySelectorAll('.gallery-item:not([style*="display: none"]) img'));
+                    const currentVisibleItems = Array.from(dom.fullGallery.querySelectorAll('.gallery-item:not(.hidden) img'));
                     openModal(img, currentVisibleItems, artwork);
                 };
                 return itemDiv;
@@ -281,7 +283,6 @@
                 subSelect.classList.add('opacity-0', 'scale-95', 'pointer-events-none');
                 subSelect.style.display = 'none';
 
-                // Dynamically build category tree from artwork data
                 const categoryTree = { 'All': {} };
                 state.allArtwork.forEach(art => {
                     art.primary.forEach(pCat => {
