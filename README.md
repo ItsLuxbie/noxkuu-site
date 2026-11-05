@@ -7,12 +7,16 @@ A plain HTML, CSS and JavaScript site hosted on the existing Azure Static Web Ap
 Edit assets/artwork.js. Entries are oldest first; append new entries at the end. The newest six appear on the home page.
 
 - src: the original full-size Azure Blob URL. Keep filename capitalisation exactly as uploaded.
-- thumbnail (optional): a smaller copy for gallery cards. The dialog always uses src. If the thumbnail fails, the card falls back to src.
+- thumbnail: the generated local WebP copy used by gallery cards. The dialog always uses src. If the thumbnail fails, the card falls back to src.
 - title and alt: the visible name and a short accessible description.
 - primary and secondary: lower-case category and series names, reused by the filters.
 - description: saved character notes shown immediately when an image opens. No AI service is called. Please review these notes with the artist.
 
-For a later thumbnail pass, export approximately 700–900px-wide WebP or JPEG copies and add their URLs as thumbnail. Keep the original uploads. Lazy loading reduces initial requests but does not reduce individual image file sizes.
+## Generate thumbnails
+
+The gallery uses WebP thumbnails stored in assets/thumbnails, at most 800px wide and 1000px tall. Full-size Azure Blob originals are left untouched and load only when opened (or if a thumbnail fails). No separate Azure upload is needed: thumbnails deploy with the static website.
+
+After adding artwork entries, install Pillow if needed with python -m pip install Pillow, then run python scripts/generate_thumbnails.py. The script downloads public originals, preserves aspect ratio and transparency, creates thumbnails, and updates the catalogue automatically. Downloads are cached in the ignored .cache folder. Use --refresh to regenerate from changed originals. Review and commit the catalogue and thumbnails together; Python is only needed for authoring, not for hosting.
 
 ## Preview locally
 

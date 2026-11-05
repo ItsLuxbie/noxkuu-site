@@ -42,7 +42,11 @@ function createCard(art, group, index) {
   image.alt = art.alt;
   image.loading = index < 3 && location.hash !== '#gallery' ? 'eager' : 'lazy';
   image.decoding = 'async';
-  // Set thumbnail to a smaller Azure image when one is available. Original remains untouched.
+  if (art.thumbnailWidth && art.thumbnailHeight) {
+    image.width = art.thumbnailWidth;
+    image.height = art.thumbnailHeight;
+  }
+  // Gallery cards use the generated local thumbnail; the dialog keeps the Azure original.
   image.src = art.thumbnail || art.src;
   image.addEventListener('error', () => {
     if (art.thumbnail && image.getAttribute('src') === art.thumbnail) image.src = art.src;
