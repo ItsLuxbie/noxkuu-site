@@ -136,3 +136,9 @@ fillSelect($('category'), [...new Set(allArtwork.flatMap(art => art.primary))], 
 $('year').textContent = new Date().getFullYear();
 addEventListener('hashchange', () => route(true));
 route();
+
+document.querySelector('.skip-link').addEventListener('click', event => {
+  event.preventDefault();
+  $('main').focus({ preventScroll: true });
+  window.scrollTo(0, 0);
+});
