@@ -8,3 +8,7 @@
 @media(min-width:1400px){#full-gallery{grid-template-columns:repeat(4,minmax(0,1fr))}}
 @media(min-width:1900px){#full-gallery{grid-template-columns:repeat(5,minmax(0,1fr))}#recent-gallery{grid-template-columns:repeat(6,minmax(0,1fr));gap:24px}}
 @media(min-width:2300px){#full-gallery{grid-template-columns:repeat(6,minmax(0,1fr))}}
+
+/* Keep the preview visible while its sharper replacement loads. */
+.art-frame #image-loading{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);width:max-content;max-width:calc(100% - 24px);padding:8px 14px;border:1px solid var(--line);border-radius:999px;background:var(--header);color:var(--ink);font-size:.75rem;text-align:center;pointer-events:none}
+.original-link{display:inline-block;margin-top:16px;font-size:.85rem}

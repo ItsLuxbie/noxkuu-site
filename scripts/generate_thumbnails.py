@@ -1,4 +1,4 @@
-"""Generate gallery thumbnails from the public Azure originals. Originals are never modified."""
+"""Generate small gallery thumbnails and sharper viewing WebPs from public Azure originals."""
 import argparse
 from concurrent.futures import ThreadPoolExecutor
 from io import BytesIO
@@ -14,7 +14,8 @@ from PIL import Image, ImageOps
 ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / 'assets' / 'artwork.js'
 CACHE = ROOT / '.cache' / 'art-originals'
-OUTPUT = ROOT / 'assets' / 'thumbnails'
+VARIANTS = [('thumbnail', 'thumbnails', (800, 1000), 82),
+            ('display', 'views', (2000, 2000), 88)]
 
 
 def generate(art, refresh=False):
@@ -37,40 +38,49 @@ def generate(art, refresh=False):
                     raise
                 time.sleep(attempt + 1)
     raw = cached.read_bytes()
-    output = OUTPUT / (image_id + '.webp')
+    result = dict(art)
+    sizes = {}
     with Image.open(BytesIO(raw)) as original:
-        image = ImageOps.exif_transpose(original)
-        image.thumbnail((800, 1000), Image.Resampling.LANCZOS)
-        if image.mode not in ('RGB', 'RGBA'):
-            image = image.convert('RGBA' if 'transparency' in image.info else 'RGB')
-        options = {'icc_profile': image.info['icc_profile']} if image.info.get('icc_profile') else {}
-        image.save(output, 'WEBP', quality=82, method=6, **options)
-        width, height = image.size
-    with Image.open(output) as check:
-        check.verify()
-    return {**art, 'thumbnail': '/assets/thumbnails/' + output.name,
-            'thumbnailWidth': width, 'thumbnailHeight': height}, len(raw), output.stat().st_size
+        source = ImageOps.exif_transpose(original)
+        if source.mode not in ('RGB', 'RGBA'):
+            source = source.convert('RGBA' if 'transparency' in source.info else 'RGB')
+        for field, folder, bounds, quality in VARIANTS:
+            output = ROOT / 'assets' / folder / (image_id + '.webp')
+            if refresh or not output.exists():
+                image = source.copy()
+                image.thumbnail(bounds, Image.Resampling.LANCZOS)
+                options = {'icc_profile': source.info['icc_profile']} if source.info.get('icc_profile') else {}
+                image.save(output, 'WEBP', quality=quality, method=6, **options)
+            with Image.open(output) as check:
+                width, height = check.size
+                check.verify()
+            result.update({field: '/assets/' + folder + '/' + output.name,
+                           field + 'Width': width, field + 'Height': height})
+            sizes[field] = output.stat().st_size
+    return result, len(raw), sizes
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--refresh', action='store_true', help='Download originals again, even when cached')
+    parser.add_argument('--refresh', action='store_true', help='Download originals again and regenerate both sizes')
     args = parser.parse_args()
-    text = DATA.read_text(encoding='utf-8')
-    comment, encoded = text.split('export const artwork = ', 1)
+    comment, encoded = DATA.read_text(encoding='utf-8').split('export const artwork = ', 1)
     artwork = json.loads(encoded.strip().removesuffix(';'))
     CACHE.mkdir(parents=True, exist_ok=True)
-    OUTPUT.mkdir(parents=True, exist_ok=True)
+    for _, folder, _, _ in VARIANTS:
+        (ROOT / 'assets' / folder).mkdir(parents=True, exist_ok=True)
     with ThreadPoolExecutor(max_workers=4) as pool:
         results = list(pool.map(lambda art: generate(art, args.refresh), artwork))
-    # Only update the catalogue once every image has downloaded and converted successfully.
+    # Only replace the catalogue after every image has converted and verified successfully.
     DATA.write_text(comment + 'export const artwork = ' + json.dumps(
-        [result[0] for result in results], ensure_ascii=False, indent=2) + ';\n', encoding='utf-8', newline='\n')
+        [result[0] for result in results], ensure_ascii=False, indent=2) + ';\n',
+        encoding='utf-8', newline='\n')
     original_bytes = sum(result[1] for result in results)
-    thumbnail_bytes = sum(result[2] for result in results)
+    view_bytes = sum(result[2]['display'] for result in results)
     print(json.dumps({'images': len(results), 'original_bytes': original_bytes,
-                      'thumbnail_bytes': thumbnail_bytes,
-                      'reduction_percent': round(100 * (1 - thumbnail_bytes / original_bytes), 1)}, indent=2))
+                      'thumbnail_bytes': sum(result[2]['thumbnail'] for result in results),
+                      'view_bytes': view_bytes,
+                      'view_reduction_percent': round(100 * (1 - view_bytes / original_bytes), 1)}, indent=2))
 
 
 if __name__ == '__main__':
