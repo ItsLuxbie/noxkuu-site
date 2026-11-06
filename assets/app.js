@@ -1,4 +1,5 @@
 import { artwork } from './artwork.js';
+import { createImageViewer } from './image-viewer.js';
 
 const allArtwork = [...artwork].reverse();
 const $ = id => document.getElementById(id);
@@ -7,6 +8,11 @@ let modalArtwork = [];
 let modalIndex = 0;
 let opener = null;
 let galleryBuilt = false;
+const imageViewer = createImageViewer({
+  image: $('art-image'), loading: $('image-loading'), error: $('image-error'),
+  originalLink: $('open-original'), isOpen: () => dialog.open,
+  getNextArtwork: () => modalArtwork.length > 1 ? modalArtwork[(modalIndex + 1) % modalArtwork.length] : null,
+});
 const label = value => value === 'dc' ? 'DC' : value === 'tv & film' ? 'TV & Film' : value === 'lol' ? 'League of Legends' : value.replace(/\b\w/g, letter => letter.toUpperCase());
 
 function setTheme(theme) {
@@ -46,7 +52,7 @@ function createCard(art, group, index) {
     image.width = art.thumbnailWidth;
     image.height = art.thumbnailHeight;
   }
-  // Gallery cards use the generated local thumbnail; the dialog keeps the Azure original.
+  // Gallery cards use a small thumbnail; the dialog loads a sharper WebP.
   image.src = art.thumbnail || art.src;
   image.addEventListener('error', () => {
     if (art.thumbnail && image.getAttribute('src') === art.thumbnail) image.src = art.src;
@@ -84,15 +90,7 @@ $('series').addEventListener('change', renderGallery);
 
 function updateModal() {
   const art = modalArtwork[modalIndex];
-  $('art-image').hidden = true;
-  $('image-loading').hidden = false;
-  $('image-error').hidden = true;
-  $('art-image').alt = art.alt;
-  $('art-image').src = art.src;
-  if ($('art-image').complete && $('art-image').naturalWidth > 0) {
-    $('art-image').hidden = false;
-    $('image-loading').hidden = true;
-  }
+  imageViewer.load(art);
   $('art-title').textContent = art.title;
   $('art-tags').textContent = [...new Set([...art.primary, ...art.secondary])].map(label).join(' · ');
   $('art-description').textContent = art.description || 'An original creation by NoxKuu.';
@@ -104,10 +102,8 @@ function changeArtwork(direction) {
   modalIndex = (modalIndex + direction + modalArtwork.length) % modalArtwork.length;
   updateModal();
 }
-$('art-image').addEventListener('error', () => { $('art-image').hidden = true; $('image-loading').hidden = true; $('image-error').hidden = false; });
-$('art-image').addEventListener('load', () => { $('art-image').hidden = false; $('image-loading').hidden = true; $('image-error').hidden = true; });
 $('close-dialog').addEventListener('click', () => dialog.close());
-dialog.addEventListener('close', () => { document.body.classList.remove('modal-open'); if (opener?.isConnected) opener.focus(); });
+dialog.addEventListener('close', () => { imageViewer.close(); document.body.classList.remove('modal-open'); if (opener?.isConnected) opener.focus(); });
 dialog.addEventListener('click', event => {
   const bounds = dialog.getBoundingClientRect();
   if (event.target === dialog && (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom)) dialog.close();
